@@ -14,7 +14,69 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      profiles: {
+        Row: {
+          committee: string | null
+          country: string | null
+          created_at: string
+          full_name: string | null
+          house: Database["public"]["Enums"]["house"] | null
+          id: string
+          seniority_tier: Database["public"]["Enums"]["seniority_tier"]
+          sorted_at: string | null
+          updated_at: string
+        }
+        Insert: {
+          committee?: string | null
+          country?: string | null
+          created_at?: string
+          full_name?: string | null
+          house?: Database["public"]["Enums"]["house"] | null
+          id: string
+          seniority_tier?: Database["public"]["Enums"]["seniority_tier"]
+          sorted_at?: string | null
+          updated_at?: string
+        }
+        Update: {
+          committee?: string | null
+          country?: string | null
+          created_at?: string
+          full_name?: string | null
+          house?: Database["public"]["Enums"]["house"] | null
+          id?: string
+          seniority_tier?: Database["public"]["Enums"]["seniority_tier"]
+          sorted_at?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      score_events: {
+        Row: {
+          created_at: string
+          house: Database["public"]["Enums"]["house"]
+          id: string
+          points: number
+          source: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          house: Database["public"]["Enums"]["house"]
+          id?: string
+          points?: number
+          source: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          house?: Database["public"]["Enums"]["house"]
+          id?: string
+          points?: number
+          source?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -23,7 +85,8 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      house: "atlas" | "aurora" | "summit" | "eclipse"
+      seniority_tier: "advanced" | "first_timer"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +213,9 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      house: ["atlas", "aurora", "summit", "eclipse"],
+      seniority_tier: ["advanced", "first_timer"],
+    },
   },
 } as const
