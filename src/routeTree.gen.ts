@@ -14,8 +14,10 @@ import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedTriviaRouteImport } from './routes/_authenticated.trivia'
 import { Route as AuthenticatedSortingRouteImport } from './routes/_authenticated.sorting'
 import { Route as AuthenticatedPortalRouteImport } from './routes/_authenticated.portal'
+import { Route as AuthenticatedLeaderboardRouteImport } from './routes/_authenticated.leaderboard'
 
 const SignupRoute = SignupRouteImport.update({
   id: '/signup',
@@ -41,6 +43,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedTriviaRoute = AuthenticatedTriviaRouteImport.update({
+  id: '/trivia',
+  path: '/trivia',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 const AuthenticatedSortingRoute = AuthenticatedSortingRouteImport.update({
   id: '/sorting',
   path: '/sorting',
@@ -51,22 +58,32 @@ const AuthenticatedPortalRoute = AuthenticatedPortalRouteImport.update({
   path: '/portal',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedLeaderboardRoute =
+  AuthenticatedLeaderboardRouteImport.update({
+    id: '/leaderboard',
+    path: '/leaderboard',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/reset-password': typeof ResetPasswordRoute
   '/signup': typeof SignupRoute
+  '/leaderboard': typeof AuthenticatedLeaderboardRoute
   '/portal': typeof AuthenticatedPortalRoute
   '/sorting': typeof AuthenticatedSortingRoute
+  '/trivia': typeof AuthenticatedTriviaRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/reset-password': typeof ResetPasswordRoute
   '/signup': typeof SignupRoute
+  '/leaderboard': typeof AuthenticatedLeaderboardRoute
   '/portal': typeof AuthenticatedPortalRoute
   '/sorting': typeof AuthenticatedSortingRoute
+  '/trivia': typeof AuthenticatedTriviaRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -75,8 +92,10 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/reset-password': typeof ResetPasswordRoute
   '/signup': typeof SignupRoute
+  '/_authenticated/leaderboard': typeof AuthenticatedLeaderboardRoute
   '/_authenticated/portal': typeof AuthenticatedPortalRoute
   '/_authenticated/sorting': typeof AuthenticatedSortingRoute
+  '/_authenticated/trivia': typeof AuthenticatedTriviaRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -85,10 +104,20 @@ export interface FileRouteTypes {
     | '/login'
     | '/reset-password'
     | '/signup'
+    | '/leaderboard'
     | '/portal'
     | '/sorting'
+    | '/trivia'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/login' | '/reset-password' | '/signup' | '/portal' | '/sorting'
+  to:
+    | '/'
+    | '/login'
+    | '/reset-password'
+    | '/signup'
+    | '/leaderboard'
+    | '/portal'
+    | '/sorting'
+    | '/trivia'
   id:
     | '__root__'
     | '/'
@@ -96,8 +125,10 @@ export interface FileRouteTypes {
     | '/login'
     | '/reset-password'
     | '/signup'
+    | '/_authenticated/leaderboard'
     | '/_authenticated/portal'
     | '/_authenticated/sorting'
+    | '/_authenticated/trivia'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -145,6 +176,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/trivia': {
+      id: '/_authenticated/trivia'
+      path: '/trivia'
+      fullPath: '/trivia'
+      preLoaderRoute: typeof AuthenticatedTriviaRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/sorting': {
       id: '/_authenticated/sorting'
       path: '/sorting'
@@ -159,17 +197,28 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedPortalRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/leaderboard': {
+      id: '/_authenticated/leaderboard'
+      path: '/leaderboard'
+      fullPath: '/leaderboard'
+      preLoaderRoute: typeof AuthenticatedLeaderboardRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
   }
 }
 
 interface AuthenticatedRouteChildren {
+  AuthenticatedLeaderboardRoute: typeof AuthenticatedLeaderboardRoute
   AuthenticatedPortalRoute: typeof AuthenticatedPortalRoute
   AuthenticatedSortingRoute: typeof AuthenticatedSortingRoute
+  AuthenticatedTriviaRoute: typeof AuthenticatedTriviaRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
+  AuthenticatedLeaderboardRoute: AuthenticatedLeaderboardRoute,
   AuthenticatedPortalRoute: AuthenticatedPortalRoute,
   AuthenticatedSortingRoute: AuthenticatedSortingRoute,
+  AuthenticatedTriviaRoute: AuthenticatedTriviaRoute,
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
