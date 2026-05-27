@@ -4,7 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { getLeaderboard } from "@/lib/leaderboard.functions";
 import { HouseCrest } from "@/components/house-crest";
 import { HOUSES, type HouseId } from "@/lib/houses";
-// leaderboard page
+
 import { Lock, Trophy, Zap } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/leaderboard")({
