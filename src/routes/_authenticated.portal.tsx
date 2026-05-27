@@ -72,17 +72,19 @@ function PortalPage() {
       </section>
 
       <section className="mt-8 space-y-3">
-        <p className="text-[10px] uppercase tracking-[0.3em] text-muted-foreground">Forthcoming Modules</p>
-        {[
-          { title: "Live Global Leaderboard", note: "Phase II" },
-          { title: "Lunchtime Geopolitical Trivia", note: "Phase III" },
-          { title: "Check-In QR & Secret Missions", note: "Phase IV" },
-        ].map((m) => (
-          <div key={m.title} className="flex items-center justify-between rounded border border-border bg-card/40 px-4 py-3">
-            <span className="text-sm">{m.title}</span>
-            <span className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground">{m.note}</span>
-          </div>
-        ))}
+        <p className="text-[10px] uppercase tracking-[0.3em] text-muted-foreground">Modules</p>
+        <Link to="/leaderboard" className="flex items-center justify-between rounded border border-border bg-card/40 px-4 py-3 hover:bg-card/60 transition-colors">
+          <span className="text-sm">Live Global Leaderboard</span>
+          <span className="text-[10px] uppercase tracking-[0.25em] text-[color:var(--house-accent)]">Enter →</span>
+        </Link>
+        <Link to="/trivia" className="flex items-center justify-between rounded border border-border bg-card/40 px-4 py-3 hover:bg-card/60 transition-colors">
+          <span className="text-sm">Lunchtime Geopolitical Trivia</span>
+          <span className="text-[10px] uppercase tracking-[0.25em] text-[color:var(--house-accent)]">Enter →</span>
+        </Link>
+        <div className="flex items-center justify-between rounded border border-border bg-card/40 px-4 py-3 opacity-60">
+          <span className="text-sm">Check-In QR & Secret Missions</span>
+          <span className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground">Phase IV</span>
+        </div>
       </section>
 
       <Button variant="outline" className="mt-10 w-full text-xs uppercase tracking-[0.2em]" disabled>
