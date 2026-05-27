@@ -14,6 +14,24 @@ export type Database = {
   }
   public: {
     Tables: {
+      app_settings: {
+        Row: {
+          key: string
+          updated_at: string
+          value: string
+        }
+        Insert: {
+          key: string
+          updated_at?: string
+          value: string
+        }
+        Update: {
+          key?: string
+          updated_at?: string
+          value?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           committee: string | null
@@ -77,9 +95,133 @@ export type Database = {
         }
         Relationships: []
       }
+      trivia_answers: {
+        Row: {
+          answered_at: string
+          created_at: string
+          id: string
+          is_correct: boolean
+          points_awarded: number
+          question_id: string
+          selected_answer: string
+          session_id: string
+          user_id: string
+        }
+        Insert: {
+          answered_at?: string
+          created_at?: string
+          id?: string
+          is_correct?: boolean
+          points_awarded?: number
+          question_id: string
+          selected_answer: string
+          session_id: string
+          user_id: string
+        }
+        Update: {
+          answered_at?: string
+          created_at?: string
+          id?: string
+          is_correct?: boolean
+          points_awarded?: number
+          question_id?: string
+          selected_answer?: string
+          session_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "trivia_answers_question_id_fkey"
+            columns: ["question_id"]
+            isOneToOne: false
+            referencedRelation: "trivia_questions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "trivia_answers_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "trivia_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      trivia_questions: {
+        Row: {
+          active_from: string | null
+          active_until: string | null
+          correct_answer: string
+          created_at: string
+          id: string
+          options: Json
+          order_index: number
+          points: number
+          question_text: string
+        }
+        Insert: {
+          active_from?: string | null
+          active_until?: string | null
+          correct_answer: string
+          created_at?: string
+          id?: string
+          options?: Json
+          order_index: number
+          points?: number
+          question_text: string
+        }
+        Update: {
+          active_from?: string | null
+          active_until?: string | null
+          correct_answer?: string
+          created_at?: string
+          id?: string
+          options?: Json
+          order_index?: number
+          points?: number
+          question_text?: string
+        }
+        Relationships: []
+      }
+      trivia_sessions: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          id: string
+          is_completed: boolean
+          started_at: string
+          total_score: number
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          is_completed?: boolean
+          started_at?: string
+          total_score?: number
+          user_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          is_completed?: boolean
+          started_at?: string
+          total_score?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
-      [_ in never]: never
+      house_scores: {
+        Row: {
+          delegate_count: number | null
+          house: Database["public"]["Enums"]["house"] | null
+          total_points: number | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       [_ in never]: never
