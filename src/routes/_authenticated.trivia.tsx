@@ -88,7 +88,7 @@ function TriviaPage() {
         <div className="mt-20 flex flex-col items-center gap-4">
           <h1 className="text-xl font-semibold tracking-tight">Lunchtime Geopolitical Trivia</h1>
           <p className="text-sm text-muted-foreground max-w-xs">10 questions. 10 points each. Server-graded. No second chances.</p>
-          <Button className="mt-4" onClick={() => startMutation.mutate({ data: {} })} disabled={startMutation.isPending}>
+          <Button className="mt-4" onClick={() => startMutation.mutate(undefined)} disabled={startMutation.isPending}>
             {startMutation.isPending ? "Starting…" : "Begin Challenge"}
           </Button>
         </div>
