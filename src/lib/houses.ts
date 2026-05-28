@@ -11,35 +11,35 @@ export interface HouseDef {
 export const HOUSES: Record<HouseId, HouseDef> = {
   atlas: {
     id: "atlas",
-    name: "House Atlas",
-    tagline: "The Empire of Strategy and Power",
+    name: "Casa Atlas",
+    tagline: "El Imperio de la Estrategia y el Poder",
     archetype:
-      "Realism. Geopolitical ambition. Cold analytical calculation. Autocratic leadership.",
-    mentors: ["Otto von Bismarck", "Winston Churchill", "Margaret Thatcher", "Alexander the Great"],
+      "Realismo. Ambición geopolítica. Cálculo analítico frío. Liderazgo autocrático.",
+    mentors: ["Otto von Bismarck", "Winston Churchill", "Margaret Thatcher", "Alejandro Magno"],
   },
   aurora: {
     id: "aurora",
-    name: "House Aurora",
-    tagline: "The Vanguard of Global Transformation",
+    name: "Casa Aurora",
+    tagline: "La Vanguardia de la Transformación Global",
     archetype:
-      "Structural idealism. Visionary creativity. Charismatic mobilization. Unyielding defense of human rights.",
+      "Idealismo estructural. Creatividad visionaria. Movilización carismática. Defensa irrenunciable de los derechos humanos.",
     mentors: ["Mahatma Gandhi", "Eleanor Roosevelt", "John F. Kennedy", "Martin Luther King Jr."],
   },
   summit: {
     id: "summit",
-    name: "House Summit",
-    tagline: "The Bastion of Executive Resilience",
+    name: "Casa Summit",
+    tagline: "El Bastión de la Resiliencia Ejecutiva",
     archetype:
-      "Absolute crisis management. Stoic composure. Iron discipline. Mediation under friction.",
+      "Gestión absoluta de crisis. Compostura estoica. Disciplina de hierro. Mediación bajo fricción.",
     mentors: ["Abraham Lincoln", "Franklin D. Roosevelt", "Dag Hammarskjöld", "George Washington"],
   },
   eclipse: {
     id: "eclipse",
-    name: "House Eclipse",
-    tagline: "The Masters of the Hidden Board",
+    name: "Casa Eclipse",
+    tagline: "Los Maestros del Tablero Oculto",
     archetype:
-      "Hyper-critical thinking. Hyper-adaptability. Surgical rhetoric. Tactical mastery of structural rules.",
-    mentors: ["Niccolò Machiavelli", "Sun Tzu", "Charles Maurice de Talleyrand", "Napoleon Bonaparte"],
+      "Pensamiento hipercrítico. Hiperadaptabilidad. Retórica quirúrgica. Dominio táctico de las reglas estructurales.",
+    mentors: ["Niccolò Machiavelli", "Sun Tzu", "Charles Maurice de Talleyrand", "Napoleón Bonaparte"],
   },
 };
 

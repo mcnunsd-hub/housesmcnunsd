@@ -13,7 +13,7 @@ import { HouseCrest } from "@/components/house-crest";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/sorting")({
-  head: () => ({ meta: [{ title: "Sorting Ceremony — MCNUN Portal" }] }),
+  head: () => ({ meta: [{ title: "Ceremonia de Selección — Portal MCNUN" }] }),
   component: SortingPage,
 });
 
@@ -36,7 +36,7 @@ function SortingPage() {
   const [answers, setAnswers] = useState<(AnswerLetter | null)[]>(() => Array(10).fill(null));
   const [revealedHouse, setRevealedHouse] = useState<HouseId | null>(null);
 
-  // Intake form
+  // Formulario de identidad
   const [fullName, setFullName] = useState("");
   const [committee, setCommittee] = useState("");
   const [country, setCountry] = useState("");
@@ -98,10 +98,10 @@ function SortingPage() {
   }
 
   if (isLoading) {
-    return <div className="flex min-h-svh items-center justify-center text-muted-foreground text-sm">Initializing…</div>;
+    return <div className="flex min-h-svh items-center justify-center text-muted-foreground text-sm">Inicializando…</div>;
   }
 
-  // ---------- REVEAL ----------
+  // ---------- REVELACIÓN ----------
   if (phase === "reveal" && revealedHouse) {
     const h = HOUSES[revealedHouse];
     return (
@@ -114,7 +114,7 @@ function SortingPage() {
             </div>
           </div>
           <p className="mt-6 text-[10px] uppercase tracking-[0.4em] text-muted-foreground animate-fade-up" style={{ animationDelay: "350ms" }}>
-            You have been sorted into
+            Has sido seleccionado para
           </p>
           <h1 className="mt-3 text-4xl font-semibold tracking-tight animate-fade-up" style={{ animationDelay: "500ms" }}>
             {h.name}
@@ -127,7 +127,7 @@ function SortingPage() {
           </p>
 
           <div className="mt-8 w-full animate-fade-up" style={{ animationDelay: "950ms" }}>
-            <p className="text-[10px] uppercase tracking-[0.3em] text-muted-foreground">Historical Mentors</p>
+            <p className="text-[10px] uppercase tracking-[0.3em] text-muted-foreground">Mentores Históricos</p>
             <div className="mt-3 grid grid-cols-2 gap-2">
               {h.mentors.map((m) => (
                 <div key={m} className="rounded border border-border bg-card/40 px-3 py-2 text-xs">{m}</div>
@@ -140,7 +140,7 @@ function SortingPage() {
             style={{ animationDelay: "1100ms" }}
             onClick={() => nav({ to: "/portal" })}
           >
-            Enter MCNUN Portal
+            Entrar al Portal MCNUN
           </Button>
         </div>
       </div>
@@ -152,7 +152,7 @@ function SortingPage() {
     return <div className="fixed inset-0 z-50 bg-black" />;
   }
 
-  // ---------- SUBMITTING (hat + haptics) ----------
+  // ---------- ENVIANDO ----------
   if (phase === "submitting") {
     return (
       <div className="flex min-h-svh items-center justify-center bg-[oklch(0.08_0_0)] px-6">
@@ -166,60 +166,60 @@ function SortingPage() {
             </svg>
           </div>
           <p className="mt-8 text-xs uppercase tracking-[0.35em] text-muted-foreground animate-pulse-glow">
-            Evaluating psychological vectors…
+            Evaluando vectores psicológicos…
           </p>
           <p className="mt-2 text-xs uppercase tracking-[0.35em] text-foreground animate-pulse-glow">
-            Your House is…
+            Tu Casa es…
           </p>
         </div>
       </div>
     );
   }
 
-  // ---------- INTAKE ----------
+  // ---------- IDENTIDAD ----------
   if (phase === "intake") {
     return (
       <div className="mx-auto flex min-h-svh max-w-md flex-col justify-center px-6 py-12">
-        <p className="text-[10px] uppercase tracking-[0.35em] text-muted-foreground">Phase 01</p>
-        <h1 className="mt-2 text-3xl font-semibold tracking-tight">Delegate Dossier</h1>
+        <p className="text-[10px] uppercase tracking-[0.35em] text-muted-foreground">Fase 01</p>
+        <h1 className="mt-2 text-3xl font-semibold tracking-tight">Expediente del Delegado</h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          Before the Sorting Ceremony, confirm your conference identity.
+          Antes de la Ceremonia de Selección, confirma tu identidad en la conferencia.
         </p>
         <form onSubmit={saveIntake} className="mt-8 space-y-4">
           <div className="space-y-1.5">
-            <Label htmlFor="fn">Full name</Label>
+            <Label htmlFor="fn">Nombre completo</Label>
             <Input id="fn" required value={fullName} onChange={(e) => setFullName(e.target.value)} />
           </div>
           <div className="space-y-1.5">
-            <Label htmlFor="committee">Committee</Label>
-            <Input id="committee" required value={committee} onChange={(e) => setCommittee(e.target.value)} placeholder="e.g. UN Security Council" />
+            <Label htmlFor="committee">Comité</Label>
+            <Input id="committee" required value={committee} onChange={(e) => setCommittee(e.target.value)} placeholder="p. ej. Consejo de Seguridad ONU" />
           </div>
           <div className="space-y-1.5">
-            <Label htmlFor="country">Country / Delegation</Label>
+            <Label htmlFor="country">País / Delegación</Label>
             <Input id="country" required value={country} onChange={(e) => setCountry(e.target.value)} />
           </div>
           <div className="space-y-2">
-            <Label>Experience tier</Label>
+            <Label>Nivel de experiencia</Label>
             <RadioGroup value={tier} onValueChange={(v) => setTier(v as "advanced" | "first_timer")} className="grid grid-cols-2 gap-2">
               <Label htmlFor="t1" className="flex cursor-pointer items-center gap-2 rounded border border-border p-3 text-xs">
-                <RadioGroupItem id="t1" value="first_timer" /> First-Timer
+                <RadioGroupItem id="t1" value="first_timer" /> Principiante
               </Label>
               <Label htmlFor="t2" className="flex cursor-pointer items-center gap-2 rounded border border-border p-3 text-xs">
-                <RadioGroupItem id="t2" value="advanced" /> Advanced
+                <RadioGroupItem id="t2" value="advanced" /> Avanzado
               </Label>
             </RadioGroup>
           </div>
-          <Button type="submit" className="w-full mt-4 tracking-[0.2em] uppercase text-xs">Begin Sorting Ceremony</Button>
+          <Button type="submit" className="w-full mt-4 tracking-[0.2em] uppercase text-xs">Comenzar Ceremonia de Selección</Button>
         </form>
       </div>
     );
   }
 
-  // ---------- QUESTIONS ----------
+  // ---------- PREGUNTAS ----------
   return (
     <div className="mx-auto flex min-h-svh max-w-md flex-col px-6 py-10">
       <div className="flex items-center justify-between text-[10px] uppercase tracking-[0.3em] text-muted-foreground">
-        <span>Question {String(q.id).padStart(2, "0")} / 10</span>
+        <span>Pregunta {String(q.id).padStart(2, "0")} / 10</span>
         <span className="font-numeric">{Math.round(((index + 1) / 10) * 100)}%</span>
       </div>
       <div className="mt-2 h-px w-full bg-border overflow-hidden">
@@ -253,15 +253,15 @@ function SortingPage() {
 
       <div className="mt-6 flex items-center justify-between gap-3">
         <Button variant="ghost" disabled={index === 0} onClick={() => setIndex(index - 1)} className="text-xs uppercase tracking-[0.2em]">
-          Previous
+          Anterior
         </Button>
         {index < 9 ? (
           <Button disabled={!answers[index]} onClick={() => setIndex(index + 1)} className="text-xs uppercase tracking-[0.2em]">
-            Next
+            Siguiente
           </Button>
         ) : (
           <Button disabled={!allAnswered} onClick={finalize} className="text-xs uppercase tracking-[0.2em]">
-            Submit
+            Enviar
           </Button>
         )}
       </div>

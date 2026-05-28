@@ -53,7 +53,7 @@ export const submitSorting = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
 
-    // Don't re-sort
+    // No re-sortear
     const { data: existing } = await supabase
       .from("profiles")
       .select("house, seniority_tier")
@@ -61,49 +61,79 @@ export const submitSorting = createServerFn({ method: "POST" })
       .maybeSingle();
     if (existing?.house) return { house: existing.house as House, resorted: false };
 
-    // Raw vector
+    // 1) Vector psicológico crudo
     const raw: Record<House, number> = { atlas: 0, aurora: 0, summit: 0, eclipse: 0 };
     for (const letter of data.answers) raw[LETTER_TO_HOUSE[letter]] += 20;
 
-    // Distribution of sorted users
+    // 2) Población actual (global y por nivel)
     const { data: pop } = await supabase
       .from("profiles")
       .select("house, seniority_tier")
       .not("house", "is", null);
 
-    const totals: Record<House, number> = { atlas: 0, aurora: 0, summit: 0, eclipse: 0 };
-    const tierTotals: Record<House, number> = { atlas: 0, aurora: 0, summit: 0, eclipse: 0 };
+    const counts: Record<House, number> = { atlas: 0, aurora: 0, summit: 0, eclipse: 0 };
+    const tierCounts: Record<House, number> = { atlas: 0, aurora: 0, summit: 0, eclipse: 0 };
     const userTier = existing?.seniority_tier ?? "first_timer";
     let total = 0;
     let totalTier = 0;
     for (const row of pop ?? []) {
       const h = row.house as House;
-      totals[h]++;
+      counts[h]++;
       total++;
       if (row.seniority_tier === userTier) {
-        tierTotals[h]++;
+        tierCounts[h]++;
         totalTier++;
       }
     }
 
-    const cap = 0.27;
-    const tierExpected = totalTier > 0 ? totalTier / 4 : 0;
+    const avgCount = total / 4;
+    const avgTier = totalTier / 4;
 
+    // 3) Multiplicadores: BALANCE DE DELEGADOS (prioridad alta) + BALANCE POR NIVEL
     const adjusted: Record<House, number> = { ...raw };
     for (const h of HOUSES) {
-      const share = total > 0 ? totals[h] / total : 0;
-      if (share >= cap) adjusted[h] *= 0.55;
-      if (totalTier > 0 && tierTotals[h] < tierExpected) adjusted[h] *= 1.25;
+      // Balance global de delegados (-0.22 por delegado sobre el promedio, +0.22 por debajo)
+      const diff = counts[h] - avgCount;
+      let countMult = Math.max(0.2, Math.min(1.8, 1 - diff * 0.22));
+      // Penalización dura si una Casa ya supera el promedio en 3+
+      if (diff >= 3) countMult *= 0.35;
+      // Bonus duro si está 3+ por debajo
+      if (diff <= -3) countMult *= 1.6;
+
+      // Balance por nivel académico
+      const tierDiff = tierCounts[h] - avgTier;
+      let tierMult = Math.max(0.5, Math.min(1.5, 1 - tierDiff * 0.18));
+
+      adjusted[h] = adjusted[h] * countMult * tierMult;
     }
 
-    // Argmax with tie-break by lowest current population
+    // 4) Argmax con desempate por menor población
     let chosen: House = "atlas";
     let bestScore = -Infinity;
     for (const h of HOUSES) {
       const s = adjusted[h];
-      if (s > bestScore || (s === bestScore && totals[h] < totals[chosen])) {
+      if (s > bestScore || (s === bestScore && counts[h] < counts[chosen])) {
         bestScore = s;
         chosen = h;
+      }
+    }
+
+    // 5) GUARDIA DURA: si la Casa elegida supera por 2+ a la menos poblada, reasignar
+    //    al candidato con score más alto entre las que NO superen ese umbral.
+    const minCount = Math.min(...HOUSES.map((h) => counts[h]));
+    if (counts[chosen] - minCount >= 2) {
+      const eligible = HOUSES.filter((h) => counts[h] - minCount < 2);
+      if (eligible.length > 0) {
+        let altChoice = eligible[0];
+        let altScore = -Infinity;
+        for (const h of eligible) {
+          const s = adjusted[h];
+          if (s > altScore || (s === altScore && counts[h] < counts[altChoice])) {
+            altScore = s;
+            altChoice = h;
+          }
+        }
+        chosen = altChoice;
       }
     }
 
