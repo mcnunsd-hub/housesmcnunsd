@@ -32,6 +32,126 @@ export type Database = {
         }
         Relationships: []
       }
+      checkin_events: {
+        Row: {
+          created_at: string
+          event_type: string
+          id: string
+          location: string | null
+          points: number
+          scanned_by: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          event_type?: string
+          id?: string
+          location?: string | null
+          points?: number
+          scanned_by: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          event_type?: string
+          id?: string
+          location?: string | null
+          points?: number
+          scanned_by?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      checkin_tokens: {
+        Row: {
+          created_at: string
+          expires_at: string
+          id: string
+          token: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          expires_at: string
+          id?: string
+          token: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          expires_at?: string
+          id?: string
+          token?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      mission_submissions: {
+        Row: {
+          created_at: string
+          id: string
+          mission_id: string
+          proof_text: string | null
+          proof_url: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          mission_id: string
+          proof_text?: string | null
+          proof_url?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          mission_id?: string
+          proof_text?: string | null
+          proof_url?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      missions: {
+        Row: {
+          active: boolean
+          created_at: string
+          description: string
+          id: string
+          points: number
+          requires_proof: boolean
+          title: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          description: string
+          id?: string
+          points?: number
+          requires_proof?: boolean
+          title: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          description?: string
+          id?: string
+          points?: number
+          requires_proof?: boolean
+          title?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           committee: string | null
@@ -212,6 +332,27 @@ export type Database = {
         }
         Relationships: []
       }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       house_scores: {
@@ -224,9 +365,16 @@ export type Database = {
       }
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
+      app_role: "delegate" | "staff" | "admin"
       house: "atlas" | "aurora" | "summit" | "eclipse"
       seniority_tier: "advanced" | "first_timer"
     }
@@ -356,6 +504,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      app_role: ["delegate", "staff", "admin"],
       house: ["atlas", "aurora", "summit", "eclipse"],
       seniority_tier: ["advanced", "first_timer"],
     },
