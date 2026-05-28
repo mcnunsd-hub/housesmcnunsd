@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Lock, ChevronRight, Check, X } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/trivia")({
-  head: () => ({ meta: [{ title: "Trivia — MCNUN Portal" }] }),
+  head: () => ({ meta: [{ title: "Trivia — Portal MCNUN" }] }),
   component: TriviaPage,
 });
 
@@ -53,7 +53,7 @@ function TriviaPage() {
 
   if (isLoading) {
     return (
-      <div className="flex min-h-svh items-center justify-center text-sm text-muted-foreground">Loading trivia…</div>
+      <div className="flex min-h-svh items-center justify-center text-sm text-muted-foreground">Cargando trivia…</div>
     );
   }
 
@@ -61,13 +61,13 @@ function TriviaPage() {
     return (
       <div className="mx-auto max-w-md px-6 py-10 text-center">
         <header className="flex items-center justify-between">
-          <p className="text-[10px] uppercase tracking-[0.35em] text-muted-foreground">MCNUN Portal</p>
+          <p className="text-[10px] uppercase tracking-[0.35em] text-muted-foreground">Portal MCNUN</p>
           <Link to="/portal" className="text-[10px] uppercase tracking-[0.3em] text-muted-foreground hover:text-foreground">Portal</Link>
         </header>
         <div className="mt-20 flex flex-col items-center gap-4">
           <Lock className="h-8 w-8 text-muted-foreground" />
-          <h1 className="text-xl font-semibold tracking-tight">Trivia Locked</h1>
-          <p className="text-sm text-muted-foreground max-w-xs">{data?.lockedReason ?? "Check back later for the Lunchtime Geopolitical Trivia challenge."}</p>
+          <h1 className="text-xl font-semibold tracking-tight">Trivia Bloqueada</h1>
+          <p className="text-sm text-muted-foreground max-w-xs">{data?.lockedReason ?? "Vuelve más tarde para el reto de Trivia Geopolítica del Almuerzo."}</p>
         </div>
       </div>
     );
@@ -82,14 +82,14 @@ function TriviaPage() {
     return (
       <div className="mx-auto max-w-md px-6 py-10 text-center">
         <header className="flex items-center justify-between">
-          <p className="text-[10px] uppercase tracking-[0.35em] text-muted-foreground">MCNUN Portal</p>
+          <p className="text-[10px] uppercase tracking-[0.35em] text-muted-foreground">Portal MCNUN</p>
           <Link to="/portal" className="text-[10px] uppercase tracking-[0.3em] text-muted-foreground hover:text-foreground">Portal</Link>
         </header>
         <div className="mt-20 flex flex-col items-center gap-4">
-          <h1 className="text-xl font-semibold tracking-tight">Lunchtime Geopolitical Trivia</h1>
-          <p className="text-sm text-muted-foreground max-w-xs">10 questions. 10 points each. Server-graded. No second chances.</p>
+          <h1 className="text-xl font-semibold tracking-tight">Trivia Geopolítica del Almuerzo</h1>
+          <p className="text-sm text-muted-foreground max-w-xs">10 preguntas. 10 puntos cada una. Calificación en servidor. Sin segundas oportunidades.</p>
           <Button className="mt-4" onClick={() => startMutation.mutate(undefined)} disabled={startMutation.isPending}>
-            {startMutation.isPending ? "Starting…" : "Begin Challenge"}
+            {startMutation.isPending ? "Iniciando…" : "Comenzar Reto"}
           </Button>
         </div>
       </div>
@@ -102,23 +102,22 @@ function TriviaPage() {
     return (
       <div className="mx-auto max-w-md px-6 py-10 text-center">
         <header className="flex items-center justify-between">
-          <p className="text-[10px] uppercase tracking-[0.35em] text-muted-foreground">MCNUN Portal</p>
+          <p className="text-[10px] uppercase tracking-[0.35em] text-muted-foreground">Portal MCNUN</p>
           <Link to="/portal" className="text-[10px] uppercase tracking-[0.3em] text-muted-foreground hover:text-foreground">Portal</Link>
         </header>
         <div className="mt-20 flex flex-col items-center gap-4">
-          <h1 className="text-2xl font-semibold tracking-tight">Challenge Complete</h1>
-          <p className="text-sm text-muted-foreground">Your house gains</p>
+          <h1 className="text-2xl font-semibold tracking-tight">Reto Completado</h1>
+          <p className="text-sm text-muted-foreground">Tu Casa recibe</p>
           <p className="text-4xl font-numeric font-bold text-[color:var(--house-accent)]">{total}</p>
-          <p className="text-xs text-muted-foreground">out of {max} possible points</p>
+          <p className="text-xs text-muted-foreground">de {max} puntos posibles</p>
           <Link to="/leaderboard" className="mt-6 inline-flex items-center gap-2 rounded-md border border-border bg-card px-4 py-2 text-xs hover:bg-card/80 transition-colors">
-            View Leaderboard <ChevronRight className="h-3.5 w-3.5" />
+            Ver Marcador <ChevronRight className="h-3.5 w-3.5" />
           </Link>
         </div>
       </div>
     );
   }
 
-  // Progress
   const allAnswered = questions.every((q) => answeredIds.has(q.id));
   const currentQ = questions[currentIndex];
   const currentAnswer = currentQ ? answers[currentQ.id] : null;
@@ -132,7 +131,7 @@ function TriviaPage() {
         data: { sessionId, questionId: currentQ.id, selectedAnswer: letter as any },
       });
       setResult(res);
-    } catch (e: any) {
+    } catch {
       setSelected(null);
     } finally {
       setIsSubmitting(false);
@@ -140,24 +139,18 @@ function TriviaPage() {
   }
 
   function nextQuestion() {
-    if (currentIndex < questions.length - 1) {
-      setCurrentIndex((i) => i + 1);
-    }
+    if (currentIndex < questions.length - 1) setCurrentIndex((i) => i + 1);
   }
-
   function prevQuestion() {
-    if (currentIndex > 0) {
-      setCurrentIndex((i) => i - 1);
-    }
+    if (currentIndex > 0) setCurrentIndex((i) => i - 1);
   }
-
   async function finish() {
     if (!allAnswered) return;
     await completeMutation.mutateAsync({ data: { sessionId } });
   }
 
   if (!currentQ) {
-    return <div className="flex min-h-svh items-center justify-center text-sm text-muted-foreground">Loading question…</div>;
+    return <div className="flex min-h-svh items-center justify-center text-sm text-muted-foreground">Cargando pregunta…</div>;
   }
 
   const qAnswered = !!currentAnswer;
@@ -165,13 +158,13 @@ function TriviaPage() {
   return (
     <div className="mx-auto max-w-md px-6 py-10">
       <header className="flex items-center justify-between">
-        <p className="text-[10px] uppercase tracking-[0.35em] text-muted-foreground">MCNUN Portal</p>
+        <p className="text-[10px] uppercase tracking-[0.35em] text-muted-foreground">Portal MCNUN</p>
         <Link to="/portal" className="text-[10px] uppercase tracking-[0.3em] text-muted-foreground hover:text-foreground">Portal</Link>
       </header>
 
       <div className="mt-8">
         <div className="flex items-center justify-between text-[10px] uppercase tracking-[0.25em] text-muted-foreground">
-          <span>Question {currentIndex + 1} / {questions.length}</span>
+          <span>Pregunta {currentIndex + 1} / {questions.length}</span>
           <span>{currentQ.points} pts</span>
         </div>
         <div className="mt-2 h-1 w-full overflow-hidden rounded-full bg-muted/30">
@@ -219,21 +212,21 @@ function TriviaPage() {
 
       {result && (
         <div className={`mt-4 rounded-lg border px-4 py-3 text-xs ${result.isCorrect ? "border-green-500/30 bg-green-500/5 text-green-400" : "border-red-500/30 bg-red-500/5 text-red-400"}`}>
-          {result.isCorrect ? `Correct! +${result.pointsAwarded} points` : "Incorrect. No points awarded."}
+          {result.isCorrect ? `¡Correcto! +${result.pointsAwarded} puntos` : "Incorrecto. Sin puntos."}
         </div>
       )}
 
       <div className="mt-8 flex items-center justify-between">
         <Button variant="outline" size="sm" onClick={prevQuestion} disabled={currentIndex === 0}>
-          Back
+          Atrás
         </Button>
         {allAnswered && currentIndex === questions.length - 1 ? (
           <Button size="sm" onClick={finish} disabled={completeMutation.isPending}>
-            {completeMutation.isPending ? "Finishing…" : "Finish & Award Points"}
+            {completeMutation.isPending ? "Finalizando…" : "Finalizar y Sumar Puntos"}
           </Button>
         ) : (
           <Button size="sm" onClick={nextQuestion} disabled={currentIndex === questions.length - 1}>
-            Next <ChevronRight className="ml-1 h-3.5 w-3.5" />
+            Siguiente <ChevronRight className="ml-1 h-3.5 w-3.5" />
           </Button>
         )}
       </div>

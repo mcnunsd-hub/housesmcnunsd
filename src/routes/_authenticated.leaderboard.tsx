@@ -8,9 +8,16 @@ import { HOUSES, type HouseId } from "@/lib/houses";
 import { Lock, Trophy, Zap } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/leaderboard")({
-  head: () => ({ meta: [{ title: "Leaderboard — MCNUN Portal" }] }),
+  head: () => ({ meta: [{ title: "Marcador — Portal MCNUN" }] }),
   component: LeaderboardPage,
 });
+
+const SOURCE_LABEL: Record<string, string> = {
+  sorting: "Selección",
+  trivia: "Trivia",
+  checkin: "Check-In",
+  mission: "Misión",
+};
 
 function LeaderboardPage() {
   const fetchLeaderboard = useServerFn(getLeaderboard);
@@ -23,7 +30,7 @@ function LeaderboardPage() {
   if (isLoading) {
     return (
       <div className="flex min-h-svh items-center justify-center text-sm text-muted-foreground">
-        Summoning scores…
+        Invocando marcadores…
       </div>
     );
   }
@@ -35,7 +42,7 @@ function LeaderboardPage() {
   return (
     <div className="mx-auto max-w-md px-6 py-10">
       <header className="flex items-center justify-between">
-        <p className="text-[10px] uppercase tracking-[0.35em] text-muted-foreground">MCNUN Portal</p>
+        <p className="text-[10px] uppercase tracking-[0.35em] text-muted-foreground">Portal MCNUN</p>
         <Link to="/portal" className="text-[10px] uppercase tracking-[0.3em] text-muted-foreground hover:text-foreground">
           Portal
         </Link>
@@ -44,12 +51,12 @@ function LeaderboardPage() {
       <section className="mt-10 text-center">
         <h1 className="text-2xl font-semibold tracking-tight flex items-center justify-center gap-2">
           <Trophy className="h-5 w-5 text-[color:var(--house-accent)]" />
-          Global Leaderboard
+          Marcador Global
         </h1>
         {data?.locked && (
           <div className="mt-3 inline-flex items-center gap-2 rounded-full border border-border bg-card/60 px-4 py-1.5 text-xs text-muted-foreground">
             <Lock className="h-3.5 w-3.5" />
-            Scores locked pending Closing Ceremony
+            Puntajes bloqueados hasta la Ceremonia de Clausura
           </div>
         )}
       </section>
@@ -77,8 +84,8 @@ function LeaderboardPage() {
                     />
                   </div>
                   <div className="mt-1.5 flex items-center justify-between text-[10px] text-muted-foreground">
-                    <span>{s.delegateCount} delegate{s.delegateCount === 1 ? "" : "s"}</span>
-                    <span className="font-numeric tabular-nums">{pct.toFixed(1)}% of max</span>
+                    <span>{s.delegateCount} delegado{s.delegateCount === 1 ? "" : "s"}</span>
+                    <span className="font-numeric tabular-nums">{pct.toFixed(1)}% del máximo</span>
                   </div>
                 </div>
               </div>
@@ -88,7 +95,7 @@ function LeaderboardPage() {
       </section>
 
       <section className="mt-10">
-        <h2 className="mb-4 text-[10px] uppercase tracking-[0.3em] text-muted-foreground">Recent Feed</h2>
+        <h2 className="mb-4 text-[10px] uppercase tracking-[0.3em] text-muted-foreground">Actividad Reciente</h2>
         <div className="space-y-2">
           {(data?.feed ?? []).map((e) => (
             <div key={e.id} className="flex items-center justify-between rounded border border-border bg-card/30 px-3 py-2 text-xs">
@@ -97,13 +104,13 @@ function LeaderboardPage() {
                 <span className="truncate">{e.delegateName}</span>
               </div>
               <div className="flex items-center gap-3 shrink-0">
-                <span className="text-[10px] uppercase tracking-[0.15em] text-muted-foreground">{e.source}</span>
+                <span className="text-[10px] uppercase tracking-[0.15em] text-muted-foreground">{SOURCE_LABEL[e.source] ?? e.source}</span>
                 <span className="font-numeric font-medium tabular-nums">+{e.points}</span>
               </div>
             </div>
           ))}
           {(data?.feed ?? []).length === 0 && (
-            <p className="text-center text-xs text-muted-foreground">No score events yet.</p>
+            <p className="text-center text-xs text-muted-foreground">Aún no hay eventos de puntaje.</p>
           )}
         </div>
       </section>

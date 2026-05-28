@@ -18,6 +18,9 @@ import { Route as AuthenticatedTriviaRouteImport } from './routes/_authenticated
 import { Route as AuthenticatedSortingRouteImport } from './routes/_authenticated.sorting'
 import { Route as AuthenticatedPortalRouteImport } from './routes/_authenticated.portal'
 import { Route as AuthenticatedLeaderboardRouteImport } from './routes/_authenticated.leaderboard'
+import { Route as AuthenticatedStaffScanRouteImport } from './routes/_authenticated.staff.scan'
+import { Route as AuthenticatedPortalMissionsRouteImport } from './routes/_authenticated.portal.missions'
+import { Route as AuthenticatedPortalCheckinRouteImport } from './routes/_authenticated.portal.checkin'
 
 const SignupRoute = SignupRouteImport.update({
   id: '/signup',
@@ -64,6 +67,23 @@ const AuthenticatedLeaderboardRoute =
     path: '/leaderboard',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedStaffScanRoute = AuthenticatedStaffScanRouteImport.update({
+  id: '/staff/scan',
+  path: '/staff/scan',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedPortalMissionsRoute =
+  AuthenticatedPortalMissionsRouteImport.update({
+    id: '/missions',
+    path: '/missions',
+    getParentRoute: () => AuthenticatedPortalRoute,
+  } as any)
+const AuthenticatedPortalCheckinRoute =
+  AuthenticatedPortalCheckinRouteImport.update({
+    id: '/checkin',
+    path: '/checkin',
+    getParentRoute: () => AuthenticatedPortalRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -71,9 +91,12 @@ export interface FileRoutesByFullPath {
   '/reset-password': typeof ResetPasswordRoute
   '/signup': typeof SignupRoute
   '/leaderboard': typeof AuthenticatedLeaderboardRoute
-  '/portal': typeof AuthenticatedPortalRoute
+  '/portal': typeof AuthenticatedPortalRouteWithChildren
   '/sorting': typeof AuthenticatedSortingRoute
   '/trivia': typeof AuthenticatedTriviaRoute
+  '/portal/checkin': typeof AuthenticatedPortalCheckinRoute
+  '/portal/missions': typeof AuthenticatedPortalMissionsRoute
+  '/staff/scan': typeof AuthenticatedStaffScanRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -81,9 +104,12 @@ export interface FileRoutesByTo {
   '/reset-password': typeof ResetPasswordRoute
   '/signup': typeof SignupRoute
   '/leaderboard': typeof AuthenticatedLeaderboardRoute
-  '/portal': typeof AuthenticatedPortalRoute
+  '/portal': typeof AuthenticatedPortalRouteWithChildren
   '/sorting': typeof AuthenticatedSortingRoute
   '/trivia': typeof AuthenticatedTriviaRoute
+  '/portal/checkin': typeof AuthenticatedPortalCheckinRoute
+  '/portal/missions': typeof AuthenticatedPortalMissionsRoute
+  '/staff/scan': typeof AuthenticatedStaffScanRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -93,9 +119,12 @@ export interface FileRoutesById {
   '/reset-password': typeof ResetPasswordRoute
   '/signup': typeof SignupRoute
   '/_authenticated/leaderboard': typeof AuthenticatedLeaderboardRoute
-  '/_authenticated/portal': typeof AuthenticatedPortalRoute
+  '/_authenticated/portal': typeof AuthenticatedPortalRouteWithChildren
   '/_authenticated/sorting': typeof AuthenticatedSortingRoute
   '/_authenticated/trivia': typeof AuthenticatedTriviaRoute
+  '/_authenticated/portal/checkin': typeof AuthenticatedPortalCheckinRoute
+  '/_authenticated/portal/missions': typeof AuthenticatedPortalMissionsRoute
+  '/_authenticated/staff/scan': typeof AuthenticatedStaffScanRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -108,6 +137,9 @@ export interface FileRouteTypes {
     | '/portal'
     | '/sorting'
     | '/trivia'
+    | '/portal/checkin'
+    | '/portal/missions'
+    | '/staff/scan'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -118,6 +150,9 @@ export interface FileRouteTypes {
     | '/portal'
     | '/sorting'
     | '/trivia'
+    | '/portal/checkin'
+    | '/portal/missions'
+    | '/staff/scan'
   id:
     | '__root__'
     | '/'
@@ -129,6 +164,9 @@ export interface FileRouteTypes {
     | '/_authenticated/portal'
     | '/_authenticated/sorting'
     | '/_authenticated/trivia'
+    | '/_authenticated/portal/checkin'
+    | '/_authenticated/portal/missions'
+    | '/_authenticated/staff/scan'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -204,21 +242,57 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedLeaderboardRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/staff/scan': {
+      id: '/_authenticated/staff/scan'
+      path: '/staff/scan'
+      fullPath: '/staff/scan'
+      preLoaderRoute: typeof AuthenticatedStaffScanRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/portal/missions': {
+      id: '/_authenticated/portal/missions'
+      path: '/missions'
+      fullPath: '/portal/missions'
+      preLoaderRoute: typeof AuthenticatedPortalMissionsRouteImport
+      parentRoute: typeof AuthenticatedPortalRoute
+    }
+    '/_authenticated/portal/checkin': {
+      id: '/_authenticated/portal/checkin'
+      path: '/checkin'
+      fullPath: '/portal/checkin'
+      preLoaderRoute: typeof AuthenticatedPortalCheckinRouteImport
+      parentRoute: typeof AuthenticatedPortalRoute
+    }
   }
 }
 
+interface AuthenticatedPortalRouteChildren {
+  AuthenticatedPortalCheckinRoute: typeof AuthenticatedPortalCheckinRoute
+  AuthenticatedPortalMissionsRoute: typeof AuthenticatedPortalMissionsRoute
+}
+
+const AuthenticatedPortalRouteChildren: AuthenticatedPortalRouteChildren = {
+  AuthenticatedPortalCheckinRoute: AuthenticatedPortalCheckinRoute,
+  AuthenticatedPortalMissionsRoute: AuthenticatedPortalMissionsRoute,
+}
+
+const AuthenticatedPortalRouteWithChildren =
+  AuthenticatedPortalRoute._addFileChildren(AuthenticatedPortalRouteChildren)
+
 interface AuthenticatedRouteChildren {
   AuthenticatedLeaderboardRoute: typeof AuthenticatedLeaderboardRoute
-  AuthenticatedPortalRoute: typeof AuthenticatedPortalRoute
+  AuthenticatedPortalRoute: typeof AuthenticatedPortalRouteWithChildren
   AuthenticatedSortingRoute: typeof AuthenticatedSortingRoute
   AuthenticatedTriviaRoute: typeof AuthenticatedTriviaRoute
+  AuthenticatedStaffScanRoute: typeof AuthenticatedStaffScanRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedLeaderboardRoute: AuthenticatedLeaderboardRoute,
-  AuthenticatedPortalRoute: AuthenticatedPortalRoute,
+  AuthenticatedPortalRoute: AuthenticatedPortalRouteWithChildren,
   AuthenticatedSortingRoute: AuthenticatedSortingRoute,
   AuthenticatedTriviaRoute: AuthenticatedTriviaRoute,
+  AuthenticatedStaffScanRoute: AuthenticatedStaffScanRoute,
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
