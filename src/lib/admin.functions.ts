@@ -235,10 +235,11 @@ export const assignRoleByEmail = createServerFn({ method: "POST" })
     // We rely on profiles having the same id as auth.users; search by full_name not reliable.
     // Use rpc to fetch user id by email via auth.admin requires service role — fallback: error if not found in profiles by stored email.
     // Simpler: find via profiles table by matching against auth.users using a security definer function.
-    const { data: matched, error: rpcErr } = await supabase.rpc("find_user_id_by_email", { _email: data.email });
+    const { data: matched, error: rpcErr } = await (supabase as any).rpc("find_user_id_by_email", { _email: data.email });
     if (rpcErr) throw new Error(rpcErr.message);
-    if (!matched) throw new Error("Usuario no encontrado con ese correo.");
-    const { error } = await supabase.from("user_roles").insert({ user_id: matched, role: data.role });
+    const matchedId = matched as string | null;
+    if (!matchedId) throw new Error("Usuario no encontrado con ese correo.");
+    const { error } = await supabase.from("user_roles").insert({ user_id: matchedId, role: data.role });
     if (error && !error.message.includes("duplicate")) throw new Error(error.message);
     return { ok: true };
   });
