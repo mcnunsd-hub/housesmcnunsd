@@ -91,7 +91,8 @@ function PortalPage() {
         <ModuleLink to="/trivia" label="Trivia Geopolítica del Almuerzo" hint="Entrar" />
         <ModuleLink to="/portal/checkin" label="Check-In QR" hint="Mostrar" />
         <ModuleLink to="/portal/missions" label="Misiones Secretas" hint="Aceptar" />
-        <ModuleLink to="/staff/scan" label="Modo Staff · Escanear" hint="Acceso" muted />
+        {isStaff && <ModuleLink to="/staff/scan" label="Modo Staff · Escanear" hint="Acceso" />}
+        {isAdmin && <ModuleLink to="/admin" label="Panel de Administración" hint="Abrir" />}
       </section>
 
       <Button variant="outline" className="mt-10 w-full text-xs uppercase tracking-[0.2em]" disabled>
