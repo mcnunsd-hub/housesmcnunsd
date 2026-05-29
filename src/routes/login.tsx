@@ -23,13 +23,25 @@ function LoginPage() {
     setLoading(true);
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     setLoading(false);
-    if (error) return toast.error(error.message);
+    if (error) {
+      const msg = error.message?.toLowerCase() ?? "";
+      if (msg.includes("invalid login")) {
+        return toast.error("Credenciales inválidas. Si te registraste con Google, usa el botón de Google abajo.", { duration: 6000 });
+      }
+      return toast.error(error.message);
+    }
     nav({ to: "/portal" });
   }
 
   async function google() {
-    const r = await lovable.auth.signInWithOAuth("google", { redirect_uri: window.location.origin });
-    if (r.error) toast.error("error" in r && r.error ? String((r.error as Error).message ?? r.error) : "Error al iniciar con Google");
+    try {
+      const r = await lovable.auth.signInWithOAuth("google", { redirect_uri: window.location.origin });
+      if ("error" in r && r.error) {
+        toast.error(String((r.error as Error).message ?? r.error));
+      }
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Error al iniciar con Google");
+    }
   }
 
   return (
