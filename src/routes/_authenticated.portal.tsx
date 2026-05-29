@@ -21,6 +21,18 @@ function PortalPage() {
     queryFn: () => fetchProfile(),
   });
 
+  const { data: myRoles } = useQuery({
+    queryKey: ["my-roles"],
+    queryFn: async () => {
+      const { data: u } = await supabase.auth.getUser();
+      if (!u.user) return [];
+      const { data } = await supabase.from("user_roles").select("role").eq("user_id", u.user.id);
+      return data?.map((r) => r.role) ?? [];
+    },
+  });
+  const isAdmin = myRoles?.includes("admin" as any);
+  const isStaff = isAdmin || myRoles?.includes("staff" as any);
+
   useEffect(() => {
     if (!isLoading && profile && !profile.house) nav({ to: "/sorting" });
   }, [profile, isLoading, nav]);
