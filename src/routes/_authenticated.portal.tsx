@@ -24,14 +24,12 @@ function PortalPage() {
   const { data: myRoles } = useQuery({
     queryKey: ["my-roles"],
     queryFn: async () => {
-      const { data: u } = await supabase.auth.getUser();
-      if (!u.user) return [];
-      const { data } = await supabase.from("user_roles").select("role").eq("user_id", u.user.id);
-      return data?.map((r) => r.role) ?? [];
+      const { data } = await (supabase as any).rpc("my_roles");
+      return (data ?? []) as string[];
     },
   });
-  const isAdmin = myRoles?.includes("admin" as any);
-  const isStaff = isAdmin || myRoles?.includes("staff" as any);
+  const isAdmin = !!myRoles?.some((r) => r === "admin" || r === "super_admin");
+  const isStaff = isAdmin || !!myRoles?.includes("staff");
 
   useEffect(() => {
     if (!isLoading && profile && !profile.house) nav({ to: "/sorting" });
