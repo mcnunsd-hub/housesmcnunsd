@@ -377,12 +377,12 @@ function RolesTab({ data }: { data: any }) {
   const assignFn = useServerFn(assignRoleByEmail);
   const revokeFn = useServerFn(revokeRole);
   const [email, setEmail] = useState("");
-  const [role, setRole] = useState<"admin" | "staff">("staff");
+  const [role, setRole] = useState<"delegate" | "mesa" | "profesor" | "staff" | "admin" | "super_admin">("staff");
 
   const assign = useMutation({
     mutationFn: () => assignFn({ data: { email, role } }),
     onSuccess: () => { qc.invalidateQueries({ queryKey: ["admin-overview"] }); setEmail(""); toast.success("Rol asignado"); },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => toast.error(e.message.includes("row-level") ? "No tienes permiso para asignar ese rol." : e.message),
   });
   const revoke = useMutation({
     mutationFn: (id: string) => revokeFn({ data: { id } }),
@@ -397,12 +397,16 @@ function RolesTab({ data }: { data: any }) {
         <div className="flex flex-wrap gap-2">
           <Input placeholder="correo@ejemplo.com" value={email} onChange={(e) => setEmail(e.target.value)} className="flex-1 min-w-[200px]" />
           <select value={role} onChange={(e) => setRole(e.target.value as any)} className="rounded border border-border bg-background px-3 text-sm">
+            <option value="delegate">Delegado</option>
+            <option value="mesa">Mesa Directiva</option>
+            <option value="profesor">Profesor</option>
             <option value="staff">Staff</option>
             <option value="admin">Admin</option>
+            <option value="super_admin">Super Admin</option>
           </select>
           <Button onClick={() => assign.mutate()} disabled={!email || assign.isPending}>Asignar</Button>
         </div>
-        <p className="text-[10px] text-muted-foreground">El usuario debe haberse registrado antes en el portal.</p>
+        <p className="text-[10px] text-muted-foreground">El usuario debe haberse registrado antes. Solo un Super Admin puede otorgar Admin o Super Admin. Cada cambio queda en el registro de auditoría.</p>
       </div>
 
       <div className="rounded border border-border bg-card/40 overflow-hidden">
