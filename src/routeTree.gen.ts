@@ -9,32 +9,23 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as IndexRouteImport } from './routes/index'
-import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
-import { Route as LoginRouteImport } from './routes/login'
-import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as SignupRouteImport } from './routes/signup'
-import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated.admin'
-import { Route as AuthenticatedLeaderboardRouteImport } from './routes/_authenticated.leaderboard'
-import { Route as AuthenticatedPortalRouteImport } from './routes/_authenticated.portal'
-import { Route as AuthenticatedSortingRouteImport } from './routes/_authenticated.sorting'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
+import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedTriviaRouteImport } from './routes/_authenticated.trivia'
-import { Route as AuthenticatedPortalCheckinRouteImport } from './routes/_authenticated.portal.checkin'
-import { Route as AuthenticatedPortalMissionsRouteImport } from './routes/_authenticated.portal.missions'
+import { Route as AuthenticatedSortingRouteImport } from './routes/_authenticated.sorting'
+import { Route as AuthenticatedPortalRouteImport } from './routes/_authenticated.portal'
+import { Route as AuthenticatedLeaderboardRouteImport } from './routes/_authenticated.leaderboard'
+import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated.admin'
 import { Route as AuthenticatedStaffScanRouteImport } from './routes/_authenticated.staff.scan'
+import { Route as AuthenticatedPortalMissionsRouteImport } from './routes/_authenticated.portal.missions'
+import { Route as AuthenticatedPortalCheckinRouteImport } from './routes/_authenticated.portal.checkin'
 
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AuthenticatedRoute = AuthenticatedRouteImport.update({
-  id: '/_authenticated',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const LoginRoute = LoginRouteImport.update({
-  id: '/login',
-  path: '/login',
+const SignupRoute = SignupRouteImport.update({
+  id: '/signup',
+  path: '/signup',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
@@ -42,14 +33,33 @@ const ResetPasswordRoute = ResetPasswordRouteImport.update({
   path: '/reset-password',
   getParentRoute: () => rootRouteImport,
 } as any)
-const SignupRoute = SignupRouteImport.update({
-  id: '/signup',
-  path: '/signup',
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
-  id: '/admin',
-  path: '/admin',
+const AuthenticatedRoute = AuthenticatedRouteImport.update({
+  id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedTriviaRoute = AuthenticatedTriviaRouteImport.update({
+  id: '/trivia',
+  path: '/trivia',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedSortingRoute = AuthenticatedSortingRouteImport.update({
+  id: '/sorting',
+  path: '/sorting',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedPortalRoute = AuthenticatedPortalRouteImport.update({
+  id: '/portal',
+  path: '/portal',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
 const AuthenticatedLeaderboardRoute =
@@ -58,38 +68,28 @@ const AuthenticatedLeaderboardRoute =
     path: '/leaderboard',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
-const AuthenticatedPortalRoute = AuthenticatedPortalRouteImport.update({
-  id: '/portal',
-  path: '/portal',
+const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
-const AuthenticatedSortingRoute = AuthenticatedSortingRouteImport.update({
-  id: '/sorting',
-  path: '/sorting',
+const AuthenticatedStaffScanRoute = AuthenticatedStaffScanRouteImport.update({
+  id: '/staff/scan',
+  path: '/staff/scan',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
-const AuthenticatedTriviaRoute = AuthenticatedTriviaRouteImport.update({
-  id: '/trivia',
-  path: '/trivia',
-  getParentRoute: () => AuthenticatedRoute,
-} as any)
-const AuthenticatedPortalCheckinRoute =
-  AuthenticatedPortalCheckinRouteImport.update({
-    id: '/checkin',
-    path: '/checkin',
-    getParentRoute: () => AuthenticatedPortalRoute,
-  } as any)
 const AuthenticatedPortalMissionsRoute =
   AuthenticatedPortalMissionsRouteImport.update({
     id: '/missions',
     path: '/missions',
     getParentRoute: () => AuthenticatedPortalRoute,
   } as any)
-const AuthenticatedStaffScanRoute = AuthenticatedStaffScanRouteImport.update({
-  id: '/staff/scan',
-  path: '/staff/scan',
-  getParentRoute: () => AuthenticatedRoute,
-} as any)
+const AuthenticatedPortalCheckinRoute =
+  AuthenticatedPortalCheckinRouteImport.update({
+    id: '/checkin',
+    path: '/checkin',
+    getParentRoute: () => AuthenticatedPortalRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -191,25 +191,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/_authenticated': {
-      id: '/_authenticated'
-      path: ''
-      fullPath: '/'
-      preLoaderRoute: typeof AuthenticatedRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/login': {
-      id: '/login'
-      path: '/login'
-      fullPath: '/login'
-      preLoaderRoute: typeof LoginRouteImport
+    '/signup': {
+      id: '/signup'
+      path: '/signup'
+      fullPath: '/signup'
+      preLoaderRoute: typeof SignupRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/reset-password': {
@@ -219,32 +205,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ResetPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/signup': {
-      id: '/signup'
-      path: '/signup'
-      fullPath: '/signup'
-      preLoaderRoute: typeof SignupRouteImport
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_authenticated/admin': {
-      id: '/_authenticated/admin'
-      path: '/admin'
-      fullPath: '/admin'
-      preLoaderRoute: typeof AuthenticatedAdminRouteImport
-      parentRoute: typeof AuthenticatedRoute
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteImport
+      parentRoute: typeof rootRouteImport
     }
-    '/_authenticated/leaderboard': {
-      id: '/_authenticated/leaderboard'
-      path: '/leaderboard'
-      fullPath: '/leaderboard'
-      preLoaderRoute: typeof AuthenticatedLeaderboardRouteImport
-      parentRoute: typeof AuthenticatedRoute
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
     }
-    '/_authenticated/portal': {
-      id: '/_authenticated/portal'
-      path: '/portal'
-      fullPath: '/portal'
-      preLoaderRoute: typeof AuthenticatedPortalRouteImport
+    '/_authenticated/trivia': {
+      id: '/_authenticated/trivia'
+      path: '/trivia'
+      fullPath: '/trivia'
+      preLoaderRoute: typeof AuthenticatedTriviaRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/sorting': {
@@ -254,19 +240,33 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSortingRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
-    '/_authenticated/trivia': {
-      id: '/_authenticated/trivia'
-      path: '/trivia'
-      fullPath: '/trivia'
-      preLoaderRoute: typeof AuthenticatedTriviaRouteImport
+    '/_authenticated/portal': {
+      id: '/_authenticated/portal'
+      path: '/portal'
+      fullPath: '/portal'
+      preLoaderRoute: typeof AuthenticatedPortalRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
-    '/_authenticated/portal/checkin': {
-      id: '/_authenticated/portal/checkin'
-      path: '/checkin'
-      fullPath: '/portal/checkin'
-      preLoaderRoute: typeof AuthenticatedPortalCheckinRouteImport
-      parentRoute: typeof AuthenticatedPortalRoute
+    '/_authenticated/leaderboard': {
+      id: '/_authenticated/leaderboard'
+      path: '/leaderboard'
+      fullPath: '/leaderboard'
+      preLoaderRoute: typeof AuthenticatedLeaderboardRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/admin': {
+      id: '/_authenticated/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AuthenticatedAdminRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/staff/scan': {
+      id: '/_authenticated/staff/scan'
+      path: '/staff/scan'
+      fullPath: '/staff/scan'
+      preLoaderRoute: typeof AuthenticatedStaffScanRouteImport
+      parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/portal/missions': {
       id: '/_authenticated/portal/missions'
@@ -275,12 +275,12 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedPortalMissionsRouteImport
       parentRoute: typeof AuthenticatedPortalRoute
     }
-    '/_authenticated/staff/scan': {
-      id: '/_authenticated/staff/scan'
-      path: '/staff/scan'
-      fullPath: '/staff/scan'
-      preLoaderRoute: typeof AuthenticatedStaffScanRouteImport
-      parentRoute: typeof AuthenticatedRoute
+    '/_authenticated/portal/checkin': {
+      id: '/_authenticated/portal/checkin'
+      path: '/checkin'
+      fullPath: '/portal/checkin'
+      preLoaderRoute: typeof AuthenticatedPortalCheckinRouteImport
+      parentRoute: typeof AuthenticatedPortalRoute
     }
   }
 }
