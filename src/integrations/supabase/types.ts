@@ -122,6 +122,130 @@ export type Database = {
         }
         Relationships: []
       }
+      committees: {
+        Row: {
+          active: boolean
+          created_at: string
+          id: string
+          name: string
+          sort_order: number
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          id?: string
+          name: string
+          sort_order?: number
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          id?: string
+          name?: string
+          sort_order?: number
+        }
+        Relationships: []
+      }
+      delegations: {
+        Row: {
+          committee_id: string
+          country: string
+          created_at: string
+          id: string
+        }
+        Insert: {
+          committee_id: string
+          country: string
+          created_at?: string
+          id?: string
+        }
+        Update: {
+          committee_id?: string
+          country?: string
+          created_at?: string
+          id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "delegations_committee_id_fkey"
+            columns: ["committee_id"]
+            isOneToOne: false
+            referencedRelation: "committees"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      invite_codes: {
+        Row: {
+          active: boolean
+          code: string
+          created_at: string
+          created_by: string | null
+          id: string
+          max_uses: number | null
+          participant_type: string
+          uses: number
+        }
+        Insert: {
+          active?: boolean
+          code: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          max_uses?: number | null
+          participant_type: string
+          uses?: number
+        }
+        Update: {
+          active?: boolean
+          code?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          max_uses?: number | null
+          participant_type?: string
+          uses?: number
+        }
+        Relationships: []
+      }
+      mesa_roster: {
+        Row: {
+          claimed_at: string | null
+          claimed_by: string | null
+          committee_id: string
+          created_at: string
+          full_name: string
+          id: string
+          position: string
+        }
+        Insert: {
+          claimed_at?: string | null
+          claimed_by?: string | null
+          committee_id: string
+          created_at?: string
+          full_name: string
+          id?: string
+          position: string
+        }
+        Update: {
+          claimed_at?: string | null
+          claimed_by?: string | null
+          committee_id?: string
+          created_at?: string
+          full_name?: string
+          id?: string
+          position?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mesa_roster_committee_id_fkey"
+            columns: ["committee_id"]
+            isOneToOne: false
+            referencedRelation: "committees"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       mission_submissions: {
         Row: {
           created_at: string
@@ -187,6 +311,66 @@ export type Database = {
           title?: string
         }
         Relationships: []
+      }
+      participants: {
+        Row: {
+          committee_id: string | null
+          country: string | null
+          created_at: string
+          experience: string | null
+          full_name: string
+          grade_level: string | null
+          mesa_roster_id: string | null
+          participant_type: string
+          school: string | null
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          committee_id?: string | null
+          country?: string | null
+          created_at?: string
+          experience?: string | null
+          full_name: string
+          grade_level?: string | null
+          mesa_roster_id?: string | null
+          participant_type: string
+          school?: string | null
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          committee_id?: string | null
+          country?: string | null
+          created_at?: string
+          experience?: string | null
+          full_name?: string
+          grade_level?: string | null
+          mesa_roster_id?: string | null
+          participant_type?: string
+          school?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "participants_committee_id_fkey"
+            columns: ["committee_id"]
+            isOneToOne: false
+            referencedRelation: "committees"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "participants_mesa_roster_id_fkey"
+            columns: ["mesa_roster_id"]
+            isOneToOne: false
+            referencedRelation: "mesa_roster"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profiles: {
         Row: {
@@ -421,6 +605,24 @@ export type Database = {
       is_staff_or_admin: { Args: { _user_id: string }; Returns: boolean }
       is_super_admin: { Args: { _user_id: string }; Returns: boolean }
       my_roles: { Args: never; Returns: string[] }
+      register_participant: {
+        Args: {
+          _code: string
+          _committee_id: string
+          _country: string
+          _experience: string
+          _full_name: string
+          _grade_level: string
+          _roster_id: string
+          _school: string
+          _type: string
+        }
+        Returns: string
+      }
+      review_participant: {
+        Args: { _approve: boolean; _reason: string; _user_id: string }
+        Returns: undefined
+      }
     }
     Enums: {
       app_role:
