@@ -32,6 +32,42 @@ export type Database = {
         }
         Relationships: []
       }
+      audit_log: {
+        Row: {
+          action: string
+          actor_id: string | null
+          after: Json | null
+          before: Json | null
+          created_at: string
+          id: string
+          reason: string | null
+          target_id: string | null
+          target_table: string | null
+        }
+        Insert: {
+          action: string
+          actor_id?: string | null
+          after?: Json | null
+          before?: Json | null
+          created_at?: string
+          id?: string
+          reason?: string | null
+          target_id?: string | null
+          target_table?: string | null
+        }
+        Update: {
+          action?: string
+          actor_id?: string | null
+          after?: Json | null
+          before?: Json | null
+          created_at?: string
+          id?: string
+          reason?: string | null
+          target_id?: string | null
+          target_table?: string | null
+        }
+        Relationships: []
+      }
       checkin_events: {
         Row: {
           created_at: string
@@ -373,9 +409,27 @@ export type Database = {
         }
         Returns: boolean
       }
+      house_population: {
+        Args: never
+        Returns: {
+          house: Database["public"]["Enums"]["house"]
+          n: number
+          seniority_tier: Database["public"]["Enums"]["seniority_tier"]
+        }[]
+      }
+      is_admin: { Args: { _user_id: string }; Returns: boolean }
+      is_staff_or_admin: { Args: { _user_id: string }; Returns: boolean }
+      is_super_admin: { Args: { _user_id: string }; Returns: boolean }
+      my_roles: { Args: never; Returns: string[] }
     }
     Enums: {
-      app_role: "delegate" | "staff" | "admin"
+      app_role:
+        | "delegate"
+        | "staff"
+        | "admin"
+        | "mesa"
+        | "profesor"
+        | "super_admin"
       house: "atlas" | "aurora" | "summit" | "eclipse"
       seniority_tier: "advanced" | "first_timer"
     }
@@ -505,7 +559,14 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["delegate", "staff", "admin"],
+      app_role: [
+        "delegate",
+        "staff",
+        "admin",
+        "mesa",
+        "profesor",
+        "super_admin",
+      ],
       house: ["atlas", "aurora", "summit", "eclipse"],
       seniority_tier: ["advanced", "first_timer"],
     },

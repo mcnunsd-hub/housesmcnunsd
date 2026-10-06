@@ -3,12 +3,7 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 async function assertAdmin(supabase: any, userId: string) {
-  const { data } = await supabase
-    .from("user_roles")
-    .select("role")
-    .eq("user_id", userId)
-    .eq("role", "admin")
-    .maybeSingle();
+  const { data } = await supabase.rpc("is_admin", { _user_id: userId });
   if (!data) throw new Error("Acceso restringido al panel de administración.");
 }
 
@@ -221,7 +216,7 @@ export const listAllTrivia = createServerFn({ method: "GET" })
 // ---------- Roles ----------
 const RoleAssignSchema = z.object({
   email: z.string().email(),
-  role: z.enum(["admin", "staff"]),
+  role: z.enum(["delegate", "mesa", "profesor", "staff", "admin", "super_admin"]),
 });
 
 export const assignRoleByEmail = createServerFn({ method: "POST" })

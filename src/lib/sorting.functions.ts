@@ -66,23 +66,20 @@ export const submitSorting = createServerFn({ method: "POST" })
     for (const letter of data.answers) raw[LETTER_TO_HOUSE[letter]] += 20;
 
     // 2) Población actual (global y por nivel)
-    const { data: pop } = await supabase
-      .from("profiles")
-      .select("house, seniority_tier")
-      .not("house", "is", null);
+    const { data: pop } = await (supabase as any).rpc("house_population");
 
     const counts: Record<House, number> = { atlas: 0, aurora: 0, summit: 0, eclipse: 0 };
     const tierCounts: Record<House, number> = { atlas: 0, aurora: 0, summit: 0, eclipse: 0 };
     const userTier = existing?.seniority_tier ?? "first_timer";
     let total = 0;
     let totalTier = 0;
-    for (const row of pop ?? []) {
-      const h = row.house as House;
-      counts[h]++;
-      total++;
+    for (const row of (pop ?? []) as { house: House; seniority_tier: string; n: number }[]) {
+      const n = Number(row.n) || 0;
+      counts[row.house] += n;
+      total += n;
       if (row.seniority_tier === userTier) {
-        tierCounts[h]++;
-        totalTier++;
+        tierCounts[row.house] += n;
+        totalTier += n;
       }
     }
 
