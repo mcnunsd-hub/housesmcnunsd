@@ -585,6 +585,15 @@ export type Database = {
       }
     }
     Functions: {
+      available_mesa_roster: {
+        Args: never
+        Returns: {
+          committee_id: string
+          full_name: string
+          id: string
+          position: string
+        }[]
+      }
       find_user_id_by_email: { Args: { _email: string }; Returns: string }
       has_role: {
         Args: {
@@ -601,9 +610,28 @@ export type Database = {
           seniority_tier: Database["public"]["Enums"]["seniority_tier"]
         }[]
       }
+      house_totals: {
+        Args: never
+        Returns: {
+          delegate_count: number
+          house: Database["public"]["Enums"]["house"]
+          total_points: number
+        }[]
+      }
       is_admin: { Args: { _user_id: string }; Returns: boolean }
       is_staff_or_admin: { Args: { _user_id: string }; Returns: boolean }
       is_super_admin: { Args: { _user_id: string }; Returns: boolean }
+      leaderboard_feed: {
+        Args: { _limit?: number }
+        Returns: {
+          created_at: string
+          delegate_name: string
+          house: Database["public"]["Enums"]["house"]
+          id: string
+          points: number
+          source: string
+        }[]
+      }
       my_roles: { Args: never; Returns: string[] }
       register_participant: {
         Args: {
