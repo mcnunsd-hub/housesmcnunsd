@@ -12,6 +12,7 @@ export const getTriviaState = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     const { supabase, userId } = context;
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
     const [{ data: settings }, { data: session }, { data: questions }] = await Promise.all([
       supabase.from("app_settings").select("key,value").eq("key", "trivia_unlocked").maybeSingle(),
@@ -21,7 +22,7 @@ export const getTriviaState = createServerFn({ method: "GET" })
         .eq("user_id", userId)
         .order("started_at", { ascending: false })
         .maybeSingle(),
-      supabase.from("trivia_questions").select("id,question_text,options,points,order_index").order("order_index"),
+      supabaseAdmin.from("trivia_questions").select("id,question_text,options,points,order_index").order("order_index"),
     ]);
 
     const unlocked = settings?.value === "true";
@@ -80,7 +81,8 @@ export const startTriviaSession = createServerFn({ method: "POST" })
 
     if (existing) return { sessionId: existing.id };
 
-    const { data: created, error } = await supabase
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: created, error } = await supabaseAdmin
       .from("trivia_sessions")
       .insert({ user_id: userId })
       .select("id")
@@ -115,8 +117,9 @@ export const submitTriviaAnswer = createServerFn({ method: "POST" })
       .maybeSingle();
     if (existing) throw new Error("Answer already submitted for this question.");
 
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     // Fetch correct answer
-    const { data: question } = await supabase
+    const { data: question } = await supabaseAdmin
       .from("trivia_questions")
       .select("correct_answer,points")
       .eq("id", data.questionId)
@@ -126,7 +129,7 @@ export const submitTriviaAnswer = createServerFn({ method: "POST" })
     const isCorrect = question.correct_answer === data.selectedAnswer;
     const pointsAwarded = isCorrect ? (question.points ?? 10) : 0;
 
-    const { error } = await supabase.from("trivia_answers").insert({
+    const { error } = await supabaseAdmin.from("trivia_answers").insert({
       session_id: data.sessionId,
       question_id: data.questionId,
       user_id: userId,
@@ -155,8 +158,9 @@ export const completeTriviaSession = createServerFn({ method: "POST" })
     if (!session || session.user_id !== userId) throw new Error("Unauthorized session.");
     if (session.is_completed) throw new Error("Already completed.");
 
-    // Sum points
-    const { data: answers } = await supabase
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    // Sum points (rows written only by the server)
+    const { data: answers } = await supabaseAdmin
       .from("trivia_answers")
       .select("points_awarded")
       .eq("session_id", data.sessionId);
@@ -164,7 +168,7 @@ export const completeTriviaSession = createServerFn({ method: "POST" })
     const totalScore = (answers ?? []).reduce((sum, a) => sum + (a.points_awarded ?? 0), 0);
 
     const nowIso = new Date().toISOString();
-    await supabase
+    await supabaseAdmin
       .from("trivia_sessions")
       .update({ is_completed: true, completed_at: nowIso, total_score: totalScore })
       .eq("id", data.sessionId);
@@ -174,7 +178,7 @@ export const completeTriviaSession = createServerFn({ method: "POST" })
     const house = profile?.house;
 
     if (house && totalScore > 0) {
-      await supabase.from("score_events").insert({
+      await supabaseAdmin.from("score_events").insert({
         user_id: userId,
         house,
         source: "trivia",

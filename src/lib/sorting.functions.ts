@@ -135,13 +135,15 @@ export const submitSorting = createServerFn({ method: "POST" })
     }
 
     const nowIso = new Date().toISOString();
-    const { error: updErr } = await supabase
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { error: updErr } = await supabaseAdmin
       .from("profiles")
       .update({ house: chosen, sorted_at: nowIso, updated_at: nowIso })
-      .eq("id", userId);
+      .eq("id", userId)
+      .is("house", null);
     if (updErr) throw new Error(updErr.message);
 
-    await supabase.from("score_events").insert({
+    await supabaseAdmin.from("score_events").insert({
       user_id: userId,
       house: chosen,
       source: "sorting",
