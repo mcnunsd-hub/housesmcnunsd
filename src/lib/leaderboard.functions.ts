@@ -8,13 +8,9 @@ export const getLeaderboard = createServerFn({ method: "GET" })
     const { supabase } = context;
 
     const [{ data: scores }, { data: settings }, { data: events }] = await Promise.all([
-      supabase.from("house_scores").select("house,total_points,delegate_count"),
+      supabase.rpc("house_totals"),
       supabase.from("app_settings").select("key,value").eq("key", "scores_locked").maybeSingle(),
-      supabase
-        .from("score_events")
-        .select("id,house,source,points,created_at,user_id,profiles(full_name)")
-        .order("created_at", { ascending: false })
-        .limit(20),
+      supabase.rpc("leaderboard_feed", { _limit: 20 }),
     ]);
 
     const locked = settings?.value === "true";
@@ -23,8 +19,8 @@ export const getLeaderboard = createServerFn({ method: "GET" })
       locked,
       scores: (scores ?? []).map((s) => ({
         house: s.house as string,
-        totalPoints: s.total_points ?? 0,
-        delegateCount: s.delegate_count ?? 0,
+        totalPoints: Number(s.total_points ?? 0),
+        delegateCount: Number(s.delegate_count ?? 0),
       })),
       feed: (events ?? []).map((e: any) => ({
         id: e.id,
@@ -32,7 +28,7 @@ export const getLeaderboard = createServerFn({ method: "GET" })
         source: e.source,
         points: e.points,
         createdAt: e.created_at,
-        delegateName: e.profiles?.full_name ?? "Delegate",
+        delegateName: e.delegate_name ?? "Delegate",
       })),
     };
   });
