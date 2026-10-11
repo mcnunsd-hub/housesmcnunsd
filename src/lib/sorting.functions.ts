@@ -78,9 +78,7 @@ export const submitSorting = createServerFn({ method: "POST" })
     const get = (h: House) => coh.get(h) ?? { house: h, total: 0, same_level: 0, same_committee: 0, same_school: 0, same_type: 0 };
     const minTotal = Math.min(...HOUSES.map((h) => get(h).total));
     // Cuota global: nadie puede quedar más de 1 por encima de la House más pequeña
-    const candidates = HOUSES.filter((h) => get(h).total - minTotal < 1 + 0) .length
-      ? HOUSES.filter((h) => get(h).total === minTotal || get(h).total - minTotal < 1)
-      : [...HOUSES];
+    const candidates = HOUSES.filter((h) => get(h).total === minTotal);
     const seed = crypto.randomUUID();
     const rand = (h: House) => {
       let x = 0;
