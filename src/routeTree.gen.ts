@@ -17,6 +17,7 @@ import { Route as SignupRouteImport } from './routes/signup'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated.admin'
 import { Route as AuthenticatedLeaderboardRouteImport } from './routes/_authenticated.leaderboard'
 import { Route as AuthenticatedPortalRouteImport } from './routes/_authenticated.portal'
+import { Route as AuthenticatedRegistroRouteImport } from './routes/_authenticated.registro'
 import { Route as AuthenticatedSortingRouteImport } from './routes/_authenticated.sorting'
 import { Route as AuthenticatedTriviaRouteImport } from './routes/_authenticated.trivia'
 import { Route as AuthenticatedPortalCheckinRouteImport } from './routes/_authenticated.portal.checkin'
@@ -63,6 +64,11 @@ const AuthenticatedPortalRoute = AuthenticatedPortalRouteImport.update({
   path: '/portal',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedRegistroRoute = AuthenticatedRegistroRouteImport.update({
+  id: '/registro',
+  path: '/registro',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 const AuthenticatedSortingRoute = AuthenticatedSortingRouteImport.update({
   id: '/sorting',
   path: '/sorting',
@@ -99,6 +105,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AuthenticatedAdminRoute
   '/leaderboard': typeof AuthenticatedLeaderboardRoute
   '/portal': typeof AuthenticatedPortalRouteWithChildren
+  '/registro': typeof AuthenticatedRegistroRoute
   '/sorting': typeof AuthenticatedSortingRoute
   '/trivia': typeof AuthenticatedTriviaRoute
   '/portal/checkin': typeof AuthenticatedPortalCheckinRoute
@@ -113,6 +120,7 @@ export interface FileRoutesByTo {
   '/admin': typeof AuthenticatedAdminRoute
   '/leaderboard': typeof AuthenticatedLeaderboardRoute
   '/portal': typeof AuthenticatedPortalRouteWithChildren
+  '/registro': typeof AuthenticatedRegistroRoute
   '/sorting': typeof AuthenticatedSortingRoute
   '/trivia': typeof AuthenticatedTriviaRoute
   '/portal/checkin': typeof AuthenticatedPortalCheckinRoute
@@ -129,6 +137,7 @@ export interface FileRoutesById {
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/_authenticated/leaderboard': typeof AuthenticatedLeaderboardRoute
   '/_authenticated/portal': typeof AuthenticatedPortalRouteWithChildren
+  '/_authenticated/registro': typeof AuthenticatedRegistroRoute
   '/_authenticated/sorting': typeof AuthenticatedSortingRoute
   '/_authenticated/trivia': typeof AuthenticatedTriviaRoute
   '/_authenticated/portal/checkin': typeof AuthenticatedPortalCheckinRoute
@@ -145,6 +154,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/leaderboard'
     | '/portal'
+    | '/registro'
     | '/sorting'
     | '/trivia'
     | '/portal/checkin'
@@ -159,6 +169,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/leaderboard'
     | '/portal'
+    | '/registro'
     | '/sorting'
     | '/trivia'
     | '/portal/checkin'
@@ -174,6 +185,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin'
     | '/_authenticated/leaderboard'
     | '/_authenticated/portal'
+    | '/_authenticated/registro'
     | '/_authenticated/sorting'
     | '/_authenticated/trivia'
     | '/_authenticated/portal/checkin'
@@ -247,6 +259,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedPortalRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/registro': {
+      id: '/_authenticated/registro'
+      path: '/registro'
+      fullPath: '/registro'
+      preLoaderRoute: typeof AuthenticatedRegistroRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/sorting': {
       id: '/_authenticated/sorting'
       path: '/sorting'
@@ -302,6 +321,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
   AuthenticatedLeaderboardRoute: typeof AuthenticatedLeaderboardRoute
   AuthenticatedPortalRoute: typeof AuthenticatedPortalRouteWithChildren
+  AuthenticatedRegistroRoute: typeof AuthenticatedRegistroRoute
   AuthenticatedSortingRoute: typeof AuthenticatedSortingRoute
   AuthenticatedTriviaRoute: typeof AuthenticatedTriviaRoute
   AuthenticatedStaffScanRoute: typeof AuthenticatedStaffScanRoute
@@ -311,6 +331,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedAdminRoute: AuthenticatedAdminRoute,
   AuthenticatedLeaderboardRoute: AuthenticatedLeaderboardRoute,
   AuthenticatedPortalRoute: AuthenticatedPortalRouteWithChildren,
+  AuthenticatedRegistroRoute: AuthenticatedRegistroRoute,
   AuthenticatedSortingRoute: AuthenticatedSortingRoute,
   AuthenticatedTriviaRoute: AuthenticatedTriviaRoute,
   AuthenticatedStaffScanRoute: AuthenticatedStaffScanRoute,
