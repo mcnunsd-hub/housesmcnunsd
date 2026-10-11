@@ -46,7 +46,7 @@ function SortingPage() {
     if (profile?.house) {
       setRevealedHouse(profile.house as HouseId);
       setPhase("reveal");
-    } else if (profile?.committee && profile.country) {
+    } else if (profile) {
       setPhase("questions");
     }
     if (profile?.full_name) setFullName(profile.full_name);
