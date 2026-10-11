@@ -12,34 +12,34 @@ export const HOUSES: Record<HouseId, HouseDef> = {
   atlas: {
     id: "atlas",
     name: "Casa Atlas",
-    tagline: "El Imperio de la Estrategia y el Poder",
+    tagline: "Strategy · The Analytical Strategist",
     archetype:
       "Realismo. Ambición geopolítica. Cálculo analítico frío. Liderazgo autocrático.",
-    mentors: ["Otto von Bismarck", "Winston Churchill", "Margaret Thatcher", "Alejandro Magno"],
+    mentors: ["Klemens von Metternich"],
   },
   aurora: {
     id: "aurora",
     name: "Casa Aurora",
-    tagline: "La Vanguardia de la Transformación Global",
+    tagline: "Idealism · The Humanitarian Idealist",
     archetype:
       "Idealismo estructural. Creatividad visionaria. Movilización carismática. Defensa irrenunciable de los derechos humanos.",
-    mentors: ["Mahatma Gandhi", "Eleanor Roosevelt", "John F. Kennedy", "Martin Luther King Jr."],
+    mentors: ["Eleanor Roosevelt"],
   },
   summit: {
     id: "summit",
     name: "Casa Summit",
-    tagline: "El Bastión de la Resiliencia Ejecutiva",
+    tagline: "Resilience · The Resilient Mediator",
     archetype:
       "Gestión absoluta de crisis. Compostura estoica. Disciplina de hierro. Mediación bajo fricción.",
-    mentors: ["Abraham Lincoln", "Franklin D. Roosevelt", "Dag Hammarskjöld", "George Washington"],
+    mentors: ["Dag Hammarskjöld"],
   },
   eclipse: {
     id: "eclipse",
     name: "Casa Eclipse",
-    tagline: "Los Maestros del Tablero Oculto",
+    tagline: "Disruption · The Disruptive Tactician",
     archetype:
       "Pensamiento hipercrítico. Hiperadaptabilidad. Retórica quirúrgica. Dominio táctico de las reglas estructurales.",
-    mentors: ["Niccolò Machiavelli", "Sun Tzu", "Charles Maurice de Talleyrand", "Napoleón Bonaparte"],
+    mentors: ["Charles Maurice de Talleyrand"],
   },
 };
 

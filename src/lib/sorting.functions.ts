@@ -60,88 +60,57 @@ export const submitSorting = createServerFn({ method: "POST" })
       .eq("id", userId)
       .maybeSingle();
     if (existing?.house) return { house: existing.house as House, resorted: false };
+    const { data: part } = await (supabase as any).from("participants").select("status").eq("user_id", userId).maybeSingle();
+    if (!part) throw new Error("Completa tu registro antes de la Ceremonia");
+    if (part.status !== "active") throw new Error("Tu registro aún está pendiente de aprobación");
 
     // 1) Vector psicológico crudo
     const raw: Record<House, number> = { atlas: 0, aurora: 0, summit: 0, eclipse: 0 };
     for (const letter of data.answers) raw[LETTER_TO_HOUSE[letter]] += 20;
 
-    // 2) Población actual (global y por nivel)
-    const { data: pop } = await (supabase as any).rpc("house_population");
-
-    const counts: Record<House, number> = { atlas: 0, aurora: 0, summit: 0, eclipse: 0 };
-    const tierCounts: Record<House, number> = { atlas: 0, aurora: 0, summit: 0, eclipse: 0 };
-    const userTier = existing?.seniority_tier ?? "first_timer";
-    let total = 0;
-    let totalTier = 0;
-    for (const row of (pop ?? []) as { house: House; seniority_tier: string; n: number }[]) {
-      const n = Number(row.n) || 0;
-      counts[row.house] += n;
-      total += n;
-      if (row.seniority_tier === userTier) {
-        tierCounts[row.house] += n;
-        totalTier += n;
-      }
-    }
-
-    const avgCount = total / 4;
-    const avgTier = totalTier / 4;
-
-    // 3) Multiplicadores: BALANCE DE DELEGADOS (prioridad alta) + BALANCE POR NIVEL
-    const adjusted: Record<House, number> = { ...raw };
-    for (const h of HOUSES) {
-      // Balance global de delegados (-0.22 por delegado sobre el promedio, +0.22 por debajo)
-      const diff = counts[h] - avgCount;
-      let countMult = Math.max(0.2, Math.min(1.8, 1 - diff * 0.22));
-      // Penalización dura si una Casa ya supera el promedio en 3+
-      if (diff >= 3) countMult *= 0.35;
-      // Bonus duro si está 3+ por debajo
-      if (diff <= -3) countMult *= 1.6;
-
-      // Balance por nivel académico
-      const tierDiff = tierCounts[h] - avgTier;
-      let tierMult = Math.max(0.5, Math.min(1.5, 1 - tierDiff * 0.18));
-
-      adjusted[h] = adjusted[h] * countMult * tierMult;
-    }
-
-    // 4) Argmax con desempate por menor población
-    let chosen: House = "atlas";
-    let bestScore = -Infinity;
-    for (const h of HOUSES) {
-      const s = adjusted[h];
-      if (s > bestScore || (s === bestScore && counts[h] < counts[chosen])) {
-        bestScore = s;
-        chosen = h;
-      }
-    }
-
-    // 5) GUARDIA DURA: si la Casa elegida supera por 2+ a la menos poblada, reasignar
-    //    al candidato con score más alto entre las que NO superen ese umbral.
-    const minCount = Math.min(...HOUSES.map((h) => counts[h]));
-    if (counts[chosen] - minCount >= 2) {
-      const eligible = HOUSES.filter((h) => counts[h] - minCount < 2);
-      if (eligible.length > 0) {
-        let altChoice = eligible[0];
-        let altScore = -Infinity;
-        for (const h of eligible) {
-          const s = adjusted[h];
-          if (s > altScore || (s === altScore && counts[h] < counts[altChoice])) {
-            altScore = s;
-            altChoice = h;
-          }
-        }
-        chosen = altChoice;
-      }
-    }
+    // 2) Asignación incremental balanceada (cohortes: nivel, comité, colegio, rol)
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: rows, error: cErr } = await (supabaseAdmin as any).rpc("house_cohort_counts", { _user_id: userId });
+    if (cErr) throw new Error(cErr.message);
+    type Row = { house: House; total: number; same_level: number; same_committee: number; same_school: number; same_type: number };
+    const coh = new Map<House, Row>();
+    for (const r of (rows ?? []) as Row[]) coh.set(r.house, {
+      house: r.house, total: Number(r.total), same_level: Number(r.same_level),
+      same_committee: Number(r.same_committee), same_school: Number(r.same_school), same_type: Number(r.same_type),
+    });
+    const get = (h: House) => coh.get(h) ?? { house: h, total: 0, same_level: 0, same_committee: 0, same_school: 0, same_type: 0 };
+    const minTotal = Math.min(...HOUSES.map((h) => get(h).total));
+    // Cuota global: nadie puede quedar más de 1 por encima de la House más pequeña
+    const candidates = HOUSES.filter((h) => get(h).total === minTotal);
+    const seed = crypto.randomUUID();
+    const rand = (h: House) => {
+      let x = 0;
+      for (const ch of seed + h) x = (x * 31 + ch.charCodeAt(0)) >>> 0;
+      return x;
+    };
+    const cohortLoad = (h: House) => { const r = get(h); return r.same_level + r.same_committee + r.same_school + r.same_type; };
+    const ranked = [...candidates].sort((a, b) =>
+      cohortLoad(a) - cohortLoad(b) ||
+      get(a).total - get(b).total ||
+      raw[b] - raw[a] ||
+      rand(a) - rand(b),
+    );
+    const chosen: House = ranked[0];
+    const cohortSnapshot = Object.fromEntries(HOUSES.map((h) => [h, get(h)]));
 
     const nowIso = new Date().toISOString();
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { error: updErr } = await supabaseAdmin
       .from("profiles")
       .update({ house: chosen, sorted_at: nowIso, updated_at: nowIso })
       .eq("id", userId)
       .is("house", null);
     if (updErr) throw new Error(updErr.message);
+
+    await (supabaseAdmin as any).from("house_assignments").insert({
+      user_id: userId, house: chosen, method: "algorithm",
+      reason: "Asignación balanceada por cohortes", fit_scores: raw,
+      answers: data.answers, cohort_snapshot: cohortSnapshot, seed,
+    });
 
     await supabaseAdmin.from("score_events").insert({
       user_id: userId,
@@ -151,4 +120,16 @@ export const submitSorting = createServerFn({ method: "POST" })
     });
 
     return { house: chosen, resorted: false };
+  });
+
+export const getMyParticipant = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { data, error } = await (context.supabase as any)
+      .from("participants")
+      .select("participant_type, status, full_name")
+      .eq("user_id", context.userId)
+      .maybeSingle();
+    if (error) throw new Error(error.message);
+    return data as { participant_type: string; status: string; full_name: string } | null;
   });
