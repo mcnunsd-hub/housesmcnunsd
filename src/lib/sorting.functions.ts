@@ -60,6 +60,9 @@ export const submitSorting = createServerFn({ method: "POST" })
       .eq("id", userId)
       .maybeSingle();
     if (existing?.house) return { house: existing.house as House, resorted: false };
+    const { data: part } = await (supabase as any).from("participants").select("status").eq("user_id", userId).maybeSingle();
+    if (!part) throw new Error("Completa tu registro antes de la Ceremonia");
+    if (part.status !== "active") throw new Error("Tu registro aún está pendiente de aprobación");
 
     // 1) Vector psicológico crudo
     const raw: Record<House, number> = { atlas: 0, aurora: 0, summit: 0, eclipse: 0 };

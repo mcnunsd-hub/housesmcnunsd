@@ -127,16 +127,20 @@ function SortingPage() {
           </p>
 
           <div className="mt-8 w-full animate-fade-up" style={{ animationDelay: "950ms" }}>
-            <p className="text-[10px] uppercase tracking-[0.3em] text-muted-foreground">Mentores Históricos</p>
-            <div className="mt-3 grid grid-cols-2 gap-2">
+            <p className="text-[10px] uppercase tracking-[0.3em] text-muted-foreground">Mentor Histórico</p>
+            <div className="mt-3 grid grid-cols-1 gap-2">
               {h.mentors.map((m) => (
                 <div key={m} className="rounded border border-border bg-card/40 px-3 py-2 text-xs">{m}</div>
               ))}
             </div>
           </div>
 
+          <p className="mt-6 text-[11px] leading-relaxed text-muted-foreground animate-fade-up" style={{ animationDelay: "1000ms" }}>
+            Tus respuestas orientan tu House, y el Secretariado equilibra las cuatro Houses para que sean justas en tamaño, nivel, comité y colegio.
+          </p>
+
           <Button
-            className="mt-10 w-full animate-fade-up tracking-[0.2em] uppercase text-xs"
+            className="mt-8 w-full animate-fade-up tracking-[0.2em] uppercase text-xs"
             style={{ animationDelay: "1100ms" }}
             onClick={() => nav({ to: "/portal" })}
           >
