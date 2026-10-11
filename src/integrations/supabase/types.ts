@@ -175,6 +175,51 @@ export type Database = {
           },
         ]
       }
+      house_assignments: {
+        Row: {
+          actor_id: string | null
+          answers: Json | null
+          cohort_snapshot: Json | null
+          created_at: string
+          fit_scores: Json | null
+          house: Database["public"]["Enums"]["house"]
+          id: string
+          method: string
+          previous_house: Database["public"]["Enums"]["house"] | null
+          reason: string | null
+          seed: string | null
+          user_id: string
+        }
+        Insert: {
+          actor_id?: string | null
+          answers?: Json | null
+          cohort_snapshot?: Json | null
+          created_at?: string
+          fit_scores?: Json | null
+          house: Database["public"]["Enums"]["house"]
+          id?: string
+          method?: string
+          previous_house?: Database["public"]["Enums"]["house"] | null
+          reason?: string | null
+          seed?: string | null
+          user_id: string
+        }
+        Update: {
+          actor_id?: string | null
+          answers?: Json | null
+          cohort_snapshot?: Json | null
+          created_at?: string
+          fit_scores?: Json | null
+          house?: Database["public"]["Enums"]["house"]
+          id?: string
+          method?: string
+          previous_house?: Database["public"]["Enums"]["house"] | null
+          reason?: string | null
+          seed?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       invite_codes: {
         Row: {
           active: boolean
@@ -585,6 +630,14 @@ export type Database = {
       }
     }
     Functions: {
+      admin_override_house: {
+        Args: {
+          _house: Database["public"]["Enums"]["house"]
+          _reason: string
+          _user_id: string
+        }
+        Returns: undefined
+      }
       available_mesa_roster: {
         Args: never
         Returns: {
@@ -601,6 +654,17 @@ export type Database = {
           _user_id: string
         }
         Returns: boolean
+      }
+      house_cohort_counts: {
+        Args: { _user_id: string }
+        Returns: {
+          house: Database["public"]["Enums"]["house"]
+          same_committee: number
+          same_level: number
+          same_school: number
+          same_type: number
+          total: number
+        }[]
       }
       house_population: {
         Args: never
