@@ -1,3 +1,4 @@
+import { pageMeta } from "@/lib/page-meta";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -8,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { ShieldCheck } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/portal/checkin")({
-  head: () => ({ meta: [{ title: "Check-In QR — Portal MCNUN" }] }),
+  head: () => pageMeta("Check-in — MCNUN Houses", "Registro de presencia en MCNUN 2026."),
   component: CheckinPage,
 });
 

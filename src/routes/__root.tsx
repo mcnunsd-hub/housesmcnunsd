@@ -63,8 +63,6 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "twitter:title", content: "MCNUN Portal" },
       { property: "og:description", content: "Official application of the MCNUN Conference — the Houses competition portal." },
       { name: "twitter:description", content: "Official application of the MCNUN Conference — the Houses competition portal." },
-      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/5bf9654e-7d74-4c11-b4fc-7108b21dedc6/id-preview-4177be38--ccd0c4da-811f-4aa3-8930-39de1231a742.lovable.app-1779930835129.png" },
-      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/5bf9654e-7d74-4c11-b4fc-7108b21dedc6/id-preview-4177be38--ccd0c4da-811f-4aa3-8930-39de1231a742.lovable.app-1779930835129.png" },
       { name: "twitter:card", content: "summary_large_image" },
       { property: "og:type", content: "website" },
     ],
@@ -86,7 +84,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
 function RootShell({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="es">
       <head><HeadContent /></head>
       <body>{children}<Scripts /></body>
     </html>
@@ -97,9 +95,13 @@ function AuthSync() {
   const router = useRouter();
   const qc = useQueryClient();
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(() => {
-      router.invalidate();
-      qc.invalidateQueries();
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
+      if (!["SIGNED_IN", "SIGNED_OUT", "USER_UPDATED"].includes(event)) return;
+      // Run outside the Auth lock: guards call getUser during invalidation.
+      setTimeout(() => {
+        void router.invalidate();
+        if (event !== "SIGNED_OUT") void qc.invalidateQueries();
+      }, 0);
     });
     return () => subscription.unsubscribe();
   }, [router, qc]);

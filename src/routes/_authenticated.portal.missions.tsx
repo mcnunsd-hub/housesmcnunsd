@@ -1,3 +1,4 @@
+import { pageMeta } from "@/lib/page-meta";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -10,7 +11,7 @@ import { Target, CheckCircle2, Clock, XCircle } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/portal/missions")({
-  head: () => ({ meta: [{ title: "Misiones Secretas — Portal MCNUN" }] }),
+  head: () => pageMeta("Misiones — MCNUN Houses", "Participación en misiones de MCNUN Houses."),
   component: MissionsPage,
 });
 

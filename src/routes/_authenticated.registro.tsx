@@ -1,22 +1,17 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, useRouter } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useServerFn } from "@tanstack/react-start";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { z } from "zod";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { getMyParticipant } from "@/lib/sorting.functions";
+import { AccessSignOut } from "@/components/access-signout";
+import { pageMeta } from "@/lib/page-meta";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 export const Route = createFileRoute("/_authenticated/registro")({
-  head: () => ({
-    meta: [
-      { title: "Registro — Portal MCNUN" },
-      { name: "description", content: "Completa tu registro como participante de MCNUN 2026." },
-    ],
-  }),
+  head: () => pageMeta("Registro de participante — MCNUN Houses", "Registro oficial de participantes de MCNUN 2026."),
   component: RegistroPage,
 });
 
@@ -38,9 +33,8 @@ const sel = "flex h-10 w-full rounded-md border border-input bg-transparent px-3
 
 function RegistroPage() {
   const nav = useNavigate();
+  const router = useRouter();
   const qc = useQueryClient();
-  const fetchPart = useServerFn(getMyParticipant);
-  const { data: part, isLoading } = useQuery({ queryKey: ["my-participant"], queryFn: () => fetchPart() });
 
   const [type, setType] = useState<PType | null>(null);
   const [fullName, setFullName] = useState("");
@@ -53,13 +47,9 @@ function RegistroPage() {
   const [code, setCode] = useState("");
   const [busy, setBusy] = useState(false);
 
-  useEffect(() => {
-    if (part?.status === "active") nav({ to: "/portal" });
-  }, [part, nav]);
-
   const { data: committees = [] } = useQuery({
     queryKey: ["committees"],
-    queryFn: async () => (await supabase.from("committees").select("id,name").eq("active", true).order("sort_order")).data ?? [],
+    queryFn: async () => { const { data, error } = await supabase.from("committees").select("id,name").eq("active", true).order("sort_order"); if (error) throw error; return data ?? []; },
   });
   const { data: delegations = [] } = useQuery({
     queryKey: ["delegations", committeeId],
@@ -81,36 +71,36 @@ function RegistroPage() {
     if (type === "mesa" && !rosterId) return toast.error("Elige tu puesto de Mesa");
     if ((type === "staff" || type === "profesor") && code.trim().length < 3) return toast.error("Escribe tu código de invitación");
     setBusy(true);
-    const { data, error } = await (supabase as any).rpc("register_participant", {
+    try {
+    // Generated RPC types mark optional SQL arguments as non-null; pass null
+    // UUIDs via the existing RPC interface, never empty strings to PostgreSQL.
+    const { error } = await (supabase as any).rpc("register_participant", {
       _type: type, _full_name: type === "mesa" ? "Mesa" : fullName.trim(), _school: school.trim(),
       _grade_level: grade.trim() || null, _experience: experience || null,
-      _committee_id: committeeId || null, _country: country || null,
+      _committee_id: committeeId || null, _country: country,
       _roster_id: rosterId || null, _code: code.trim() || null,
     });
-    setBusy(false);
-    if (error) return toast.error(error.message);
+    if (error) throw error;
     await qc.invalidateQueries();
-    if (data === "pending") return;
-    nav({ to: type === "delegado" ? "/sorting" : "/portal" });
+    await router.invalidate();
+    await nav({ to: "/portal", replace: true });
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No fue posible completar el registro. Intente nuevamente.");
+    } finally { setBusy(false); }
   }
-
-  if (isLoading) return <Center>Cargando…</Center>;
-  if (part?.status === "pending")
-    return <Center><p className="font-heading text-xl">Solicitud enviada</p><p className="mt-2 text-sm text-muted-foreground">El Secretariado revisará tu registro como {part.participant_type}. Vuelve más tarde.</p><SignOut /></Center>;
-  if (part?.status === "rejected")
-    return <Center><p className="font-heading text-xl">Registro no aprobado</p><p className="mt-2 text-sm text-muted-foreground">Contacta al Secretariado de MCNUN.</p><SignOut /></Center>;
 
   return (
     <div className="mx-auto max-w-md px-6 py-10">
       <p className="text-[10px] uppercase tracking-[0.35em] text-muted-foreground">MCNUN 2026 · Registro</p>
       <h1 className="mt-2 text-2xl font-semibold tracking-tight">¿Cómo participas?</h1>
+      <p className="mt-2 text-sm text-muted-foreground">Registro incompleto. Complete su ficha para continuar.</p>
       <div className="mt-6 grid gap-2">
         {TYPES.map((t) => (
-          <button key={t.id} type="button" onClick={() => setType(t.id)}
-            className={`rounded border px-4 py-3 text-left transition-colors ${type === t.id ? "border-primary bg-primary/10" : "border-border bg-card/40 hover:bg-card/60"}`}>
+          <Button key={t.id} type="button" variant="outline" onClick={() => setType(t.id)}
+            className={`h-auto flex-col items-start whitespace-normal px-4 py-3 text-left ${type === t.id ? "border-primary bg-primary/10" : "border-border bg-card/40 hover:bg-card/60"}`}>
             <span className="block text-sm font-medium">{t.label}</span>
             <span className="block text-xs text-muted-foreground">{t.hint}</span>
-          </button>
+          </Button>
         ))}
       </div>
 
@@ -160,17 +150,11 @@ function RegistroPage() {
           </Button>
         </form>
       )}
+      <AccessSignOut />
     </div>
   );
 }
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return <div className="space-y-1.5"><Label className="text-xs">{label}</Label>{children}</div>;
-}
-function Center({ children }: { children: React.ReactNode }) {
-  return <div className="mx-auto flex min-h-svh max-w-md flex-col items-center justify-center px-6 text-center text-sm">{children}</div>;
-}
-function SignOut() {
-  const nav = useNavigate();
-  return <button onClick={async () => { await supabase.auth.signOut(); nav({ to: "/login" }); }} className="mt-8 text-[10px] uppercase tracking-[0.3em] text-muted-foreground">Cerrar sesión</button>;
 }

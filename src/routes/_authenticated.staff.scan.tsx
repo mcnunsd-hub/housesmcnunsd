@@ -1,3 +1,4 @@
+import { pageMeta } from "@/lib/page-meta";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -10,7 +11,7 @@ import { Scan, Check, X } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/staff/scan")({
-  head: () => ({ meta: [{ title: "Staff · Escaneo — Portal MCNUN" }] }),
+  head: () => pageMeta("Escaneo Staff — MCNUN Houses", "Acceso operativo de Staff en MCNUN Houses."),
   validateSearch: (s: Record<string, unknown>) => ({ token: typeof s.token === "string" ? s.token : undefined }),
   component: StaffScanPage,
 });

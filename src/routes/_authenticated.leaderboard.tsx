@@ -1,3 +1,4 @@
+import { pageMeta } from "@/lib/page-meta";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -8,7 +9,7 @@ import { HOUSES, type HouseId } from "@/lib/houses";
 import { Lock, Trophy, Zap } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/leaderboard")({
-  head: () => ({ meta: [{ title: "Marcador — Portal MCNUN" }] }),
+  head: () => pageMeta("Marcador — MCNUN Houses", "Marcador de participación de las Houses de MCNUN 2026."),
   component: LeaderboardPage,
 });
 

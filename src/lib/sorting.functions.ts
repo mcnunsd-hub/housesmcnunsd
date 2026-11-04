@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { canAttendSorting } from "./onboarding";
 
 const AnswerSchema = z.object({
   answers: z.array(z.enum(["A", "B", "C", "D"])).length(10),
@@ -54,15 +55,23 @@ export const submitSorting = createServerFn({ method: "POST" })
     const { supabase, userId } = context;
 
     // No re-sortear
-    const { data: existing } = await supabase
+    const { data: existing, error: profileError } = await supabase
       .from("profiles")
       .select("house, seniority_tier")
       .eq("id", userId)
       .maybeSingle();
+    const [participantResult, rolesResult] = await Promise.all([
+      supabase.from("participants").select("participant_type,status,full_name,school,experience,committee_id,country,mesa_roster_id").eq("user_id", userId).maybeSingle(),
+      supabase.rpc("my_roles"),
+    ]);
+    if (profileError || participantResult.error || rolesResult.error) throw new Error("No fue posible comprobar su registro. Intente nuevamente.");
+    const part = participantResult.data;
+    if (!part) throw new Error("Complete su registro antes de acceder a la Ceremonia.");
+    if (part.status !== "active") throw new Error("Su registro no está aprobado. Consulte el estado de su solicitud.");
     if (existing?.house) return { house: existing.house as House, resorted: false };
-    const { data: part } = await (supabase as any).from("participants").select("status").eq("user_id", userId).maybeSingle();
-    if (!part) throw new Error("Completa tu registro antes de la Ceremonia");
-    if (part.status !== "active") throw new Error("Tu registro aún está pendiente de aprobación");
+    if (!existing || !canAttendSorting({ participant: part, roles: rolesResult.data ?? [], house: null })) {
+      throw new Error("Su ficha o rol no cumple los requisitos de la Ceremonia. Solicite revisión al Secretariado.");
+    }
 
     // 1) Vector psicológico crudo
     const raw: Record<House, number> = { atlas: 0, aurora: 0, summit: 0, eclipse: 0 };
