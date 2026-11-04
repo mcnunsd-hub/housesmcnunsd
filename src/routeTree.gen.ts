@@ -15,11 +15,13 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as SignupRouteImport } from './routes/signup'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated.admin'
+import { Route as AuthenticatedEstadoRouteImport } from './routes/_authenticated.estado'
 import { Route as AuthenticatedLeaderboardRouteImport } from './routes/_authenticated.leaderboard'
 import { Route as AuthenticatedPortalRouteImport } from './routes/_authenticated.portal'
 import { Route as AuthenticatedRegistroRouteImport } from './routes/_authenticated.registro'
 import { Route as AuthenticatedSortingRouteImport } from './routes/_authenticated.sorting'
 import { Route as AuthenticatedTriviaRouteImport } from './routes/_authenticated.trivia'
+import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
 import { Route as AuthenticatedPortalCheckinRouteImport } from './routes/_authenticated.portal.checkin'
 import { Route as AuthenticatedPortalMissionsRouteImport } from './routes/_authenticated.portal.missions'
 import { Route as AuthenticatedStaffScanRouteImport } from './routes/_authenticated.staff.scan'
@@ -53,6 +55,11 @@ const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
   path: '/admin',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedEstadoRoute = AuthenticatedEstadoRouteImport.update({
+  id: '/estado',
+  path: '/estado',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 const AuthenticatedLeaderboardRoute =
   AuthenticatedLeaderboardRouteImport.update({
     id: '/leaderboard',
@@ -79,6 +86,11 @@ const AuthenticatedTriviaRoute = AuthenticatedTriviaRouteImport.update({
   path: '/trivia',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthCallbackRoute = AuthCallbackRouteImport.update({
+  id: '/auth/callback',
+  path: '/auth/callback',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedPortalCheckinRoute =
   AuthenticatedPortalCheckinRouteImport.update({
     id: '/checkin',
@@ -103,11 +115,13 @@ export interface FileRoutesByFullPath {
   '/reset-password': typeof ResetPasswordRoute
   '/signup': typeof SignupRoute
   '/admin': typeof AuthenticatedAdminRoute
+  '/estado': typeof AuthenticatedEstadoRoute
   '/leaderboard': typeof AuthenticatedLeaderboardRoute
   '/portal': typeof AuthenticatedPortalRouteWithChildren
   '/registro': typeof AuthenticatedRegistroRoute
   '/sorting': typeof AuthenticatedSortingRoute
   '/trivia': typeof AuthenticatedTriviaRoute
+  '/auth/callback': typeof AuthCallbackRoute
   '/portal/checkin': typeof AuthenticatedPortalCheckinRoute
   '/portal/missions': typeof AuthenticatedPortalMissionsRoute
   '/staff/scan': typeof AuthenticatedStaffScanRoute
@@ -118,11 +132,13 @@ export interface FileRoutesByTo {
   '/reset-password': typeof ResetPasswordRoute
   '/signup': typeof SignupRoute
   '/admin': typeof AuthenticatedAdminRoute
+  '/estado': typeof AuthenticatedEstadoRoute
   '/leaderboard': typeof AuthenticatedLeaderboardRoute
   '/portal': typeof AuthenticatedPortalRouteWithChildren
   '/registro': typeof AuthenticatedRegistroRoute
   '/sorting': typeof AuthenticatedSortingRoute
   '/trivia': typeof AuthenticatedTriviaRoute
+  '/auth/callback': typeof AuthCallbackRoute
   '/portal/checkin': typeof AuthenticatedPortalCheckinRoute
   '/portal/missions': typeof AuthenticatedPortalMissionsRoute
   '/staff/scan': typeof AuthenticatedStaffScanRoute
@@ -135,11 +151,13 @@ export interface FileRoutesById {
   '/reset-password': typeof ResetPasswordRoute
   '/signup': typeof SignupRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
+  '/_authenticated/estado': typeof AuthenticatedEstadoRoute
   '/_authenticated/leaderboard': typeof AuthenticatedLeaderboardRoute
   '/_authenticated/portal': typeof AuthenticatedPortalRouteWithChildren
   '/_authenticated/registro': typeof AuthenticatedRegistroRoute
   '/_authenticated/sorting': typeof AuthenticatedSortingRoute
   '/_authenticated/trivia': typeof AuthenticatedTriviaRoute
+  '/auth/callback': typeof AuthCallbackRoute
   '/_authenticated/portal/checkin': typeof AuthenticatedPortalCheckinRoute
   '/_authenticated/portal/missions': typeof AuthenticatedPortalMissionsRoute
   '/_authenticated/staff/scan': typeof AuthenticatedStaffScanRoute
@@ -152,11 +170,13 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/signup'
     | '/admin'
+    | '/estado'
     | '/leaderboard'
     | '/portal'
     | '/registro'
     | '/sorting'
     | '/trivia'
+    | '/auth/callback'
     | '/portal/checkin'
     | '/portal/missions'
     | '/staff/scan'
@@ -167,11 +187,13 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/signup'
     | '/admin'
+    | '/estado'
     | '/leaderboard'
     | '/portal'
     | '/registro'
     | '/sorting'
     | '/trivia'
+    | '/auth/callback'
     | '/portal/checkin'
     | '/portal/missions'
     | '/staff/scan'
@@ -183,11 +205,13 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/signup'
     | '/_authenticated/admin'
+    | '/_authenticated/estado'
     | '/_authenticated/leaderboard'
     | '/_authenticated/portal'
     | '/_authenticated/registro'
     | '/_authenticated/sorting'
     | '/_authenticated/trivia'
+    | '/auth/callback'
     | '/_authenticated/portal/checkin'
     | '/_authenticated/portal/missions'
     | '/_authenticated/staff/scan'
@@ -199,6 +223,7 @@ export interface RootRouteChildren {
   LoginRoute: typeof LoginRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   SignupRoute: typeof SignupRoute
+  AuthCallbackRoute: typeof AuthCallbackRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -245,6 +270,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/estado': {
+      id: '/_authenticated/estado'
+      path: '/estado'
+      fullPath: '/estado'
+      preLoaderRoute: typeof AuthenticatedEstadoRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/leaderboard': {
       id: '/_authenticated/leaderboard'
       path: '/leaderboard'
@@ -279,6 +311,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/trivia'
       preLoaderRoute: typeof AuthenticatedTriviaRouteImport
       parentRoute: typeof AuthenticatedRoute
+    }
+    '/auth/callback': {
+      id: '/auth/callback'
+      path: '/auth/callback'
+      fullPath: '/auth/callback'
+      preLoaderRoute: typeof AuthCallbackRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/_authenticated/portal/checkin': {
       id: '/_authenticated/portal/checkin'
@@ -319,6 +358,7 @@ const AuthenticatedPortalRouteWithChildren =
 
 interface AuthenticatedRouteChildren {
   AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
+  AuthenticatedEstadoRoute: typeof AuthenticatedEstadoRoute
   AuthenticatedLeaderboardRoute: typeof AuthenticatedLeaderboardRoute
   AuthenticatedPortalRoute: typeof AuthenticatedPortalRouteWithChildren
   AuthenticatedRegistroRoute: typeof AuthenticatedRegistroRoute
@@ -329,6 +369,7 @@ interface AuthenticatedRouteChildren {
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedAdminRoute: AuthenticatedAdminRoute,
+  AuthenticatedEstadoRoute: AuthenticatedEstadoRoute,
   AuthenticatedLeaderboardRoute: AuthenticatedLeaderboardRoute,
   AuthenticatedPortalRoute: AuthenticatedPortalRouteWithChildren,
   AuthenticatedRegistroRoute: AuthenticatedRegistroRoute,
@@ -347,6 +388,7 @@ const rootRouteChildren: RootRouteChildren = {
   LoginRoute: LoginRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   SignupRoute: SignupRoute,
+  AuthCallbackRoute: AuthCallbackRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
