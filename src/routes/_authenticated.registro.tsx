@@ -72,11 +72,13 @@ function RegistroPage() {
     if ((type === "staff" || type === "profesor") && code.trim().length < 3) return toast.error("Escribe tu código de invitación");
     setBusy(true);
     try {
-    const { error } = await supabase.rpc("register_participant", {
+    // Generated RPC types mark optional SQL arguments as non-null; pass null
+    // UUIDs via the existing RPC interface, never empty strings to PostgreSQL.
+    const { error } = await (supabase as any).rpc("register_participant", {
       _type: type, _full_name: type === "mesa" ? "Mesa" : fullName.trim(), _school: school.trim(),
-      _grade_level: grade.trim(), _experience: experience,
+      _grade_level: grade.trim() || null, _experience: experience || null,
       _committee_id: committeeId || null, _country: country,
-      _roster_id: rosterId || null, _code: code.trim(),
+      _roster_id: rosterId || null, _code: code.trim() || null,
     });
     if (error) throw error;
     await qc.invalidateQueries();
