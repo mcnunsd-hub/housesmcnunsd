@@ -4,26 +4,26 @@ import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useMemo, useState } from "react";
 import { SORTING_QUESTIONS, type AnswerLetter } from "@/lib/sorting-questions";
 import { HOUSES, type HouseId } from "@/lib/houses";
-import { getMyProfile, submitSorting, upsertMyProfile } from "@/lib/sorting.functions";
+import { getMyProfile, submitSorting } from "@/lib/sorting.functions";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { HouseCrest } from "@/components/house-crest";
 import { toast } from "sonner";
+import { pageMeta } from "@/lib/page-meta";
+import { getMyAccess } from "@/lib/onboarding.functions";
+import { accessDestination } from "@/lib/onboarding";
 
 export const Route = createFileRoute("/_authenticated/sorting")({
-  head: () => ({ meta: [{ title: "Ceremonia de Selección — Portal MCNUN" }] }),
+  head: () => pageMeta("Ceremonia de Selección — MCNUN Houses", "Ceremonia de asignación de House para participantes registrados de MCNUN 2026."),
   component: SortingPage,
 });
 
-type Phase = "intake" | "questions" | "submitting" | "blackout" | "reveal";
+type Phase = "questions" | "submitting" | "blackout" | "reveal";
 
 function SortingPage() {
   const nav = useNavigate();
   const qc = useQueryClient();
   const fetchProfile = useServerFn(getMyProfile);
-  const upsert = useServerFn(upsertMyProfile);
+  const fetchAccess = useServerFn(getMyAccess);
   const submit = useServerFn(submitSorting);
 
   const { data: profile, isLoading } = useQuery({
@@ -31,40 +31,20 @@ function SortingPage() {
     queryFn: () => fetchProfile(),
   });
 
-  const [phase, setPhase] = useState<Phase>("intake");
+  const [phase, setPhase] = useState<Phase>("questions");
   const [index, setIndex] = useState(0);
   const [answers, setAnswers] = useState<(AnswerLetter | null)[]>(() => Array(10).fill(null));
   const [revealedHouse, setRevealedHouse] = useState<HouseId | null>(null);
-
-  // Formulario de identidad
-  const [fullName, setFullName] = useState("");
-  const [committee, setCommittee] = useState("");
-  const [country, setCountry] = useState("");
-  const [tier, setTier] = useState<"advanced" | "first_timer">("first_timer");
 
   useEffect(() => {
     if (profile?.house) {
       setRevealedHouse(profile.house as HouseId);
       setPhase("reveal");
-    } else if (profile) {
-      setPhase("questions");
     }
-    if (profile?.full_name) setFullName(profile.full_name);
   }, [profile]);
 
   const q = SORTING_QUESTIONS[index];
   const allAnswered = useMemo(() => answers.every((a) => a !== null), [answers]);
-
-  async function saveIntake(e: React.FormEvent) {
-    e.preventDefault();
-    try {
-      await upsert({ data: { full_name: fullName, committee, country, seniority_tier: tier } });
-      await qc.invalidateQueries({ queryKey: ["my-profile"] });
-      setPhase("questions");
-    } catch (err) {
-      toast.error((err as Error).message);
-    }
-  }
 
   function pick(letter: AnswerLetter) {
     const next = [...answers];
@@ -94,6 +74,10 @@ function SortingPage() {
     } catch (err) {
       toast.error((err as Error).message);
       setPhase("questions");
+      try {
+        const destination = accessDestination(await fetchAccess());
+        if (destination !== "/sorting") await nav({ to: destination, replace: true });
+      } catch { toast.error("No fue posible verificar su acceso. Intente nuevamente."); }
     }
   }
 
@@ -170,51 +154,12 @@ function SortingPage() {
             </svg>
           </div>
           <p className="mt-8 text-xs uppercase tracking-[0.35em] text-muted-foreground animate-pulse-glow">
-            Evaluando vectores psicológicos…
+            Procesando la asignación de su House…
           </p>
           <p className="mt-2 text-xs uppercase tracking-[0.35em] text-foreground animate-pulse-glow">
             Tu Casa es…
           </p>
         </div>
-      </div>
-    );
-  }
-
-  // ---------- IDENTIDAD ----------
-  if (phase === "intake") {
-    return (
-      <div className="mx-auto flex min-h-svh max-w-md flex-col justify-center px-6 py-12">
-        <p className="text-[10px] uppercase tracking-[0.35em] text-muted-foreground">Fase 01</p>
-        <h1 className="mt-2 text-3xl font-semibold tracking-tight">Expediente del Delegado</h1>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Antes de la Ceremonia de Selección, confirma tu identidad en la conferencia.
-        </p>
-        <form onSubmit={saveIntake} className="mt-8 space-y-4">
-          <div className="space-y-1.5">
-            <Label htmlFor="fn">Nombre completo</Label>
-            <Input id="fn" required value={fullName} onChange={(e) => setFullName(e.target.value)} />
-          </div>
-          <div className="space-y-1.5">
-            <Label htmlFor="committee">Comité</Label>
-            <Input id="committee" required value={committee} onChange={(e) => setCommittee(e.target.value)} placeholder="p. ej. Consejo de Seguridad ONU" />
-          </div>
-          <div className="space-y-1.5">
-            <Label htmlFor="country">País / Delegación</Label>
-            <Input id="country" required value={country} onChange={(e) => setCountry(e.target.value)} />
-          </div>
-          <div className="space-y-2">
-            <Label>Nivel de experiencia</Label>
-            <RadioGroup value={tier} onValueChange={(v) => setTier(v as "advanced" | "first_timer")} className="grid grid-cols-2 gap-2">
-              <Label htmlFor="t1" className="flex cursor-pointer items-center gap-2 rounded border border-border p-3 text-xs">
-                <RadioGroupItem id="t1" value="first_timer" /> Principiante
-              </Label>
-              <Label htmlFor="t2" className="flex cursor-pointer items-center gap-2 rounded border border-border p-3 text-xs">
-                <RadioGroupItem id="t2" value="advanced" /> Avanzado
-              </Label>
-            </RadioGroup>
-          </div>
-          <Button type="submit" className="w-full mt-4 tracking-[0.2em] uppercase text-xs">Comenzar Ceremonia de Selección</Button>
-        </form>
       </div>
     );
   }
@@ -238,18 +183,20 @@ function SortingPage() {
           {q.options.map((opt) => {
             const selected = answers[index] === opt.letter;
             return (
-              <button
+              <Button
                 key={opt.letter}
+                variant="outline"
+                aria-pressed={selected}
                 onClick={() => pick(opt.letter)}
                 className={[
-                  "w-full text-left rounded-md border p-4 text-sm leading-relaxed transition-all",
+                  "h-auto w-full whitespace-normal text-left justify-start rounded-md border p-4 text-sm leading-relaxed transition-all",
                   selected
                     ? "border-foreground bg-card scale-[0.99]"
                     : "border-border bg-card/40 hover:border-foreground/60",
                 ].join(" ")}
               >
                 {opt.text}
-              </button>
+              </Button>
             );
           })}
         </div>

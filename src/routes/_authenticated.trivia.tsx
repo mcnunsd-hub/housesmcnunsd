@@ -1,3 +1,4 @@
+import { pageMeta } from "@/lib/page-meta";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -7,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Lock, ChevronRight, Check, X } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/trivia")({
-  head: () => ({ meta: [{ title: "Trivia — Portal MCNUN" }] }),
+  head: () => pageMeta("Trivia — MCNUN Houses", "Trivia geopolítica de MCNUN 2026."),
   component: TriviaPage,
 });
 

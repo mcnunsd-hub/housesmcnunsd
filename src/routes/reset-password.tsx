@@ -1,3 +1,4 @@
+import { pageMeta } from "@/lib/page-meta";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -7,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/reset-password")({
-  head: () => ({ meta: [{ title: "Restablecer contraseña — Portal MCNUN" }] }),
+  head: () => pageMeta("Restablecer contraseña — MCNUN Houses", "Recuperación segura del acceso a MCNUN Houses."),
   component: ResetPage,
 });
 
