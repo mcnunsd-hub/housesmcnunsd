@@ -6,9 +6,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
+import { pageMeta } from "@/lib/page-meta";
 
 export const Route = createFileRoute("/signup")({
-  head: () => ({ meta: [{ title: "Registro — Portal MCNUN" }] }),
+  head: () => pageMeta("Crear cuenta — MCNUN Houses", "Creación de cuenta para el registro de participantes de MCNUN 2026."),
   component: SignupPage,
 });
 
@@ -18,27 +19,38 @@ function SignupPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [confirmation, setConfirmation] = useState(false);
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
-        emailRedirectTo: window.location.origin,
+        emailRedirectTo: `${window.location.origin}/auth/callback`,
         data: { full_name: fullName },
       },
     });
     setLoading(false);
     if (error) return toast.error(error.message);
-    nav({ to: "/portal" });
+    if (!data.session) { setConfirmation(true); return; }
+    nav({ to: "/portal", replace: true });
   }
 
   async function google() {
-    const r = await lovable.auth.signInWithOAuth("google", { redirect_uri: window.location.origin });
-    if (r.error) toast.error("Error al iniciar con Google");
+    try {
+      const r = await lovable.auth.signInWithOAuth("google", { redirect_uri: `${window.location.origin}/auth/callback` });
+      if (r.error) { toast.error("No fue posible iniciar sesión con Google."); return; }
+      if (!r.redirected) await nav({ to: "/portal", replace: true });
+    } catch { toast.error("No fue posible iniciar sesión con Google."); }
   }
+
+  if (confirmation) return <div className="mx-auto flex min-h-svh max-w-sm flex-col justify-center px-6 text-center">
+    <h1 className="text-2xl font-semibold">Confirme su correo</h1>
+    <p className="mt-4 text-sm text-muted-foreground" role="status">Revise su correo y utilice el enlace de confirmación para continuar con su registro en MCNUN.</p>
+    <Button variant="outline" className="mt-6" onClick={() => nav({ to: "/login" })}>Volver al acceso</Button>
+  </div>;
 
   return (
     <div className="flex min-h-svh items-center justify-center px-6 py-12 house-radial-bg">

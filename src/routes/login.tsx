@@ -6,9 +6,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
+import { pageMeta } from "@/lib/page-meta";
 
 export const Route = createFileRoute("/login")({
-  head: () => ({ meta: [{ title: "Acceso — Portal MCNUN" }] }),
+  head: () => pageMeta("Iniciar sesión — MCNUN Houses", "Acceso seguro a MCNUN Houses mediante correo o Google."),
   component: LoginPage,
 });
 
@@ -30,15 +31,17 @@ function LoginPage() {
       }
       return toast.error(error.message);
     }
-    nav({ to: "/portal" });
+    nav({ to: "/portal", replace: true });
   }
 
   async function google() {
     try {
-      const r = await lovable.auth.signInWithOAuth("google", { redirect_uri: window.location.origin });
+      const r = await lovable.auth.signInWithOAuth("google", { redirect_uri: `${window.location.origin}/auth/callback` });
       if ("error" in r && r.error) {
         toast.error(String((r.error as Error).message ?? r.error));
+        return;
       }
+      if (!r.redirected) await nav({ to: "/portal", replace: true });
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Error al iniciar con Google");
     }
@@ -51,7 +54,7 @@ function LoginPage() {
           <p className="text-[10px] uppercase tracking-[0.35em] text-muted-foreground">MCNUN</p>
           <h1 className="mt-2 text-3xl font-semibold tracking-tight">Acceso al Portal</h1>
           <p className="mt-2 text-sm text-muted-foreground">
-            Entrada autenticada para delegados sorteados y no sorteados.
+            Acceso oficial para participantes de MCNUN 2026.
           </p>
         </div>
 

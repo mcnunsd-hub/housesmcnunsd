@@ -37,6 +37,10 @@ export function canAttendSorting(state: AccessState) {
 export function accessDestination(state: AccessState): "/admin" | "/registro" | "/sorting" | "/portal" | "/estado" {
   if (isAdministrator(state.roles)) return "/admin";
   if (!state.participant) return "/registro";
+  // Existing assignments remain accessible, including legacy backfilled records.
+  if (state.house && state.participant.status === "active" &&
+    ((state.participant.participant_type === "delegado" && state.roles.includes("delegate")) ||
+    (state.participant.participant_type === "mesa" && state.roles.includes("mesa")))) return "/portal";
   if (!canAttendSorting(state)) return "/estado";
   return state.house ? "/portal" : "/sorting";
 }

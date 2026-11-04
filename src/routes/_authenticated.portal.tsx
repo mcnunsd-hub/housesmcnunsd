@@ -1,39 +1,29 @@
-import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { useEffect } from "react";
 import { getMyProfile } from "@/lib/sorting.functions";
 import { HOUSES, type HouseId } from "@/lib/houses";
 import { HouseCrest } from "@/components/house-crest";
 import { Button } from "@/components/ui/button";
-import { supabase } from "@/integrations/supabase/client";
+import { AccessSignOut } from "@/components/access-signout";
+import { pageMeta } from "@/lib/page-meta";
 
 export const Route = createFileRoute("/_authenticated/portal")({
-  head: () => ({ meta: [{ title: "Portal MCNUN" }] }),
+  head: () => pageMeta("Portal personal — MCNUN Houses", "Su House y experiencias de participación en MCNUN 2026."),
   component: PortalPage,
 });
 
 function PortalPage() {
-  const nav = useNavigate();
+  const { access } = Route.useRouteContext();
   const fetchProfile = useServerFn(getMyProfile);
   const { data: profile, isLoading } = useQuery({
     queryKey: ["my-profile"],
     queryFn: () => fetchProfile(),
   });
 
-  const { data: myRoles } = useQuery({
-    queryKey: ["my-roles"],
-    queryFn: async () => {
-      const { data } = await (supabase as any).rpc("my_roles");
-      return (data ?? []) as string[];
-    },
-  });
+  const myRoles = access.roles;
   const isAdmin = !!myRoles?.some((r) => r === "admin" || r === "super_admin");
   const isStaff = isAdmin || !!myRoles?.includes("staff");
-
-  useEffect(() => {
-    if (!isLoading && profile && !profile.house) nav({ to: "/sorting" });
-  }, [profile, isLoading, nav]);
 
   if (isLoading || !profile) {
     return <div className="flex min-h-svh items-center justify-center text-sm text-muted-foreground">Cargando…</div>;
@@ -46,12 +36,7 @@ function PortalPage() {
     <div className="mx-auto max-w-md px-6 py-10">
       <header className="flex items-center justify-between">
         <p className="text-[10px] uppercase tracking-[0.35em] text-muted-foreground">Portal MCNUN</p>
-        <button
-          onClick={async () => { await supabase.auth.signOut(); nav({ to: "/login" }); }}
-          className="text-[10px] uppercase tracking-[0.3em] text-muted-foreground hover:text-foreground"
-        >
-          Cerrar sesión
-        </button>
+        <AccessSignOut />
       </header>
 
       <section className="mt-10 rounded-lg border border-border bg-card/40 p-6 house-radial-bg">
