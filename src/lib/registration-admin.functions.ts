@@ -12,7 +12,9 @@ async function authorized(db: SupabaseClient<Database>, userId: string) {
 async function catalogsFrom(db: SupabaseClient<Database>): Promise<Catalogs> {
   const results = await Promise.all(catalogKinds.map(kind => db.from(kind).select("*").order("created_at").limit(10000)));
   for (const result of results) if (result.error) throw new Error("No se pudieron cargar los catálogos. Intente nuevamente.");
-  return Object.fromEntries(catalogKinds.map((kind, index) => [kind, results[index]?.data ?? []])) as Catalogs;
+  const catalogs: Catalogs = { committees: [], delegations: [], mesa_roster: [], invite_codes: [] };
+  catalogKinds.forEach((kind, index) => { catalogs[kind] = results[index]?.data ?? []; });
+  return catalogs;
 }
 export const getRegistrationCatalogs = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth]).handler(async ({ context }) => {
