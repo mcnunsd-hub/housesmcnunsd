@@ -6,9 +6,9 @@ export async function readCatalogFile(file: File, kind: CatalogKind): Promise<Re
   let rows: Record<string, unknown>[];
   if (/\.csv$/i.test(file.name)) {
     const result = Papa.parse<Record<string, unknown>>(await file.text(), { header: true, skipEmptyLines: "greedy", transformHeader: h => h.replace(/^\uFEFF/, "").trim().toLowerCase() });
-    if (result.errors.length) throw new Error(`CSV inválido: ${result.errors[0]?.message}`);
     rows = result.data;
     if (!catalogFields[kind].every(f => result.meta.fields?.includes(f))) throw new Error(`Columnas requeridas: ${catalogFields[kind].join(", ")}`);
+    if (result.errors.length) throw new Error(`CSV inválido: ${result.errors[0]?.message}`);
   } else if (/\.xlsx$/i.test(file.name)) {
     // Excel runs only after a browser file selection; never imports Node workbook APIs into SSR.
     const { default: ExcelJS } = await import("exceljs");
