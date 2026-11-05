@@ -1,6 +1,6 @@
 # Fase 1 — Onboarding y registro
-- [ ] Activar catálogos administrativos con creación, edición y carga CSV/Excel validada.
-- [ ] Verificar el registro administrativo sin modificar participantes ni Houses.
+- [x] Conectar catálogos administrativos y preparar creación, edición y carga CSV/Excel validada.
+- [ ] Verificar creación, edición e importación con lectura posterior en /admin — bloqueado: la sesión propia disponible no tiene rol administrativo; requiere sesión autorizada y datos de prueba aprobados.
 - [ ] Centralizar acceso por sesión, ficha, estado y rol.
 - [ ] Corregir retorno OAuth y confirmación de correo.
 - [ ] Conectar registro y retirar toma de datos residual de Ceremonia.
