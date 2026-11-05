@@ -17,13 +17,14 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
+import { RegistrationAdmin } from "@/components/admin-registration";
 
 export const Route = createFileRoute("/_authenticated/admin")({
   head: () => pageMeta("Panel de Administración — MCNUN Houses", "Administración autorizada de MCNUN Houses."),
   component: AdminPage,
 });
 
-type Tab = "overview" | "houses" | "trivia" | "missions" | "roles" | "settings";
+type Tab = "overview" | "registration" | "houses" | "trivia" | "missions" | "roles" | "settings";
 
 function AdminPage() {
   const nav = useNavigate();
@@ -59,24 +60,26 @@ function AdminPage() {
       <nav className="mt-6 flex flex-wrap gap-2 border-b border-border">
         {([
           ["overview", "Resumen"],
+          ["registration", "Registro"],
           ["houses", "Casas"],
           ["trivia", "Trivia"],
           ["missions", "Misiones"],
           ["roles", "Roles"],
           ["settings", "Ajustes"],
         ] as const).map(([k, l]) => (
-          <button
+          <Button variant="ghost"
             key={k}
             onClick={() => setTab(k)}
             className={`px-3 py-2 text-xs uppercase tracking-[0.2em] border-b-2 -mb-px ${
               tab === k ? "border-foreground text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"
             }`}
-          >{l}</button>
+          >{l}</Button>
         ))}
       </nav>
 
       <div className="mt-6">
         {tab === "overview" && <OverviewTab data={data} />}
+        {tab === "registration" && <RegistrationAdmin />}
         {tab === "houses" && <HousesTab data={data} />}
         {tab === "trivia" && <TriviaTab />}
         {tab === "missions" && <MissionsTab />}
