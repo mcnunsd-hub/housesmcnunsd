@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { RegistrationCatalogAdmin } from "@/components/registration-catalog-admin";
 
 const db = supabase as any;
 const sel = "h-9 rounded-md border border-input bg-transparent px-2 text-xs";
@@ -13,6 +14,11 @@ function useList(key: string, fn: () => Promise<any[]>) {
 }
 
 export function RegistrationAdmin() {
+  return <RegistrationCatalogAdmin />;
+}
+
+// Retained for existing review workflows; catalog setup never changes participants or Houses.
+export function LegacyRegistrationAdmin() {
   const qc = useQueryClient();
   const refresh = () => qc.invalidateQueries({ queryKey: ["adm"] });
   const run = async (p: PromiseLike<{ error: any }>, ok: string) => {
