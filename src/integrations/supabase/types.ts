@@ -724,6 +724,8 @@ export type Database = {
         | "mesa"
         | "profesor"
         | "super_admin"
+        | "validator"
+        | "participant"
       house: "atlas" | "aurora" | "summit" | "eclipse"
       seniority_tier: "advanced" | "first_timer"
     }
@@ -860,6 +862,8 @@ export const Constants = {
         "mesa",
         "profesor",
         "super_admin",
+        "validator",
+        "participant",
       ],
       house: ["atlas", "aurora", "summit", "eclipse"],
       seniority_tier: ["advanced", "first_timer"],

@@ -43,6 +43,13 @@
       "when": 1793762877571,
       "tag": "0005_validate_initial_registration",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1793937217930,
+      "tag": "0006_extend_access_role_enum",
+      "breakpoints": true
     }
   ]
 }
