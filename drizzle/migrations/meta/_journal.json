@@ -57,6 +57,13 @@
       "when": 1793937243532,
       "tag": "0007_participant_identity_privacy",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1793937273816,
+      "tag": "0008_house_reference_compatibility",
+      "breakpoints": true
     }
   ]
 }

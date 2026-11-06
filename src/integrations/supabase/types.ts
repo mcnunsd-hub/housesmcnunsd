@@ -460,6 +460,7 @@ export type Database = {
           created_at: string
           full_name: string | null
           house: Database["public"]["Enums"]["house"] | null
+          house_id: Database["public"]["Enums"]["house"] | null
           id: string
           seniority_tier: Database["public"]["Enums"]["seniority_tier"]
           sorted_at: string | null
@@ -471,6 +472,7 @@ export type Database = {
           created_at?: string
           full_name?: string | null
           house?: Database["public"]["Enums"]["house"] | null
+          house_id?: Database["public"]["Enums"]["house"] | null
           id: string
           seniority_tier?: Database["public"]["Enums"]["seniority_tier"]
           sorted_at?: string | null
@@ -482,12 +484,21 @@ export type Database = {
           created_at?: string
           full_name?: string | null
           house?: Database["public"]["Enums"]["house"] | null
+          house_id?: Database["public"]["Enums"]["house"] | null
           id?: string
           seniority_tier?: Database["public"]["Enums"]["seniority_tier"]
           sorted_at?: string | null
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "profiles_house_reference"
+            columns: ["house_id"]
+            isOneToOne: false
+            referencedRelation: "houses"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       score_events: {
         Row: {
