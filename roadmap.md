@@ -1,4 +1,7 @@
 # Fase 1 — Onboarding y registro
+- [ ] Añadir estructura compatible de Houses, grupos e identidad estable sin modificar pantallas.
+- [ ] Reforzar privacidad de afiliaciones y bloqueo de marcadores en la base de datos.
+- [ ] Verificar esquema, tipos y pruebas de seguridad sin modificar participantes existentes.
 - [x] Conectar catálogos administrativos y preparar creación, edición y carga CSV/Excel validada.
 - [ ] Verificar creación, edición e importación con lectura posterior en /admin — bloqueado: la sesión propia disponible no tiene rol administrativo; requiere sesión autorizada y datos de prueba aprobados.
 - [ ] Centralizar acceso por sesión, ficha, estado y rol.
