@@ -220,6 +220,24 @@ export type Database = {
         }
         Relationships: []
       }
+      houses: {
+        Row: {
+          color_name: string
+          id: Database["public"]["Enums"]["house"]
+          name: string
+        }
+        Insert: {
+          color_name: string
+          id: Database["public"]["Enums"]["house"]
+          name: string
+        }
+        Update: {
+          color_name?: string
+          id?: Database["public"]["Enums"]["house"]
+          name?: string
+        }
+        Relationships: []
+      }
       invite_codes: {
         Row: {
           active: boolean
@@ -359,13 +377,19 @@ export type Database = {
       }
       participants: {
         Row: {
+          approval_status: string | null
           committee_id: string | null
           country: string | null
           created_at: string
+          delegation_or_school: string | null
+          email: string | null
           experience: string | null
           full_name: string
           grade_level: string | null
+          id: string | null
           mesa_roster_id: string | null
+          participant_group: string | null
+          participant_id_stable: string | null
           participant_type: string
           school: string | null
           status: string
@@ -373,13 +397,19 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          approval_status?: string | null
           committee_id?: string | null
           country?: string | null
           created_at?: string
+          delegation_or_school?: string | null
+          email?: string | null
           experience?: string | null
           full_name: string
           grade_level?: string | null
+          id?: string | null
           mesa_roster_id?: string | null
+          participant_group?: string | null
+          participant_id_stable?: string | null
           participant_type: string
           school?: string | null
           status?: string
@@ -387,13 +417,19 @@ export type Database = {
           user_id: string
         }
         Update: {
+          approval_status?: string | null
           committee_id?: string | null
           country?: string | null
           created_at?: string
+          delegation_or_school?: string | null
+          email?: string | null
           experience?: string | null
           full_name?: string
           grade_level?: string | null
+          id?: string | null
           mesa_roster_id?: string | null
+          participant_group?: string | null
+          participant_id_stable?: string | null
           participant_type?: string
           school?: string | null
           status?: string
@@ -682,7 +718,9 @@ export type Database = {
           total_points: number
         }[]
       }
-      is_admin: { Args: { _user_id: string }; Returns: boolean }
+      is_admin:
+        | { Args: never; Returns: boolean }
+        | { Args: { _user_id: string }; Returns: boolean }
       is_staff_or_admin: { Args: { _user_id: string }; Returns: boolean }
       is_super_admin: { Args: { _user_id: string }; Returns: boolean }
       leaderboard_feed: {
@@ -715,6 +753,7 @@ export type Database = {
         Args: { _approve: boolean; _reason: string; _user_id: string }
         Returns: undefined
       }
+      scores_are_locked: { Args: never; Returns: boolean }
     }
     Enums: {
       app_role:
