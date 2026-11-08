@@ -46,6 +46,7 @@ function RegistroPage() {
   const [rosterId, setRosterId] = useState("");
   const [code, setCode] = useState("");
   const [busy, setBusy] = useState(false);
+  const [draftMode, setDraftMode] = useState(false);
 
   const { data: committees = [] } = useQuery({
     queryKey: ["committees"],
@@ -64,6 +65,10 @@ function RegistroPage() {
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
+    if (import.meta.env.DEV && draftMode) {
+      await nav({ to: "/auditoria-dashboard" });
+      return;
+    }
     if (!type) return;
     const parsed = base.safeParse({ full_name: type === "mesa" ? "Mesa" : fullName, school });
     if (!parsed.success) return toast.error(parsed.error.issues[0].message);
@@ -103,6 +108,11 @@ function RegistroPage() {
           </Button>
         ))}
       </div>
+
+      {import.meta.env.DEV && <label className="mt-6 flex cursor-pointer items-start gap-3 rounded-md border border-primary/40 bg-primary/10 p-4 text-xs">
+        <input type="checkbox" className="mt-0.5" checked={draftMode} onChange={(event) => setDraftMode(event.target.checked)} />
+        <span><span className="block font-medium">Modo borrador local</span><span className="mt-1 block text-muted-foreground">Abre un Dashboard simulado sin validar ni guardar el registro. No crea acceso real ni modifica la base de datos.</span></span>
+      </label>}
 
       {type && (
         <form onSubmit={submit} className="mt-8 space-y-4">
@@ -146,7 +156,7 @@ function RegistroPage() {
           )}
 
           <Button type="submit" disabled={busy} className="w-full text-xs uppercase tracking-[0.2em]">
-            {busy ? "Enviando…" : type === "delegado" ? "Continuar a la Ceremonia" : "Completar registro"}
+            {draftMode && import.meta.env.DEV ? "Completar registro en modo borrador" : busy ? "Enviando…" : type === "delegado" ? "Continuar a la Ceremonia" : "Completar registro"}
           </Button>
         </form>
       )}

@@ -18,16 +18,19 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { RegistrationAdmin } from "@/components/admin-registration";
+import { AdminAuditLab } from "@/components/admin-audit-lab";
 
 export const Route = createFileRoute("/_authenticated/admin")({
   head: () => pageMeta("Panel de Administración — MCNUN Houses", "Administración autorizada de MCNUN Houses."),
   component: AdminPage,
 });
 
-type Tab = "overview" | "registration" | "houses" | "trivia" | "missions" | "roles" | "settings";
+type Tab = "overview" | "audit" | "registration" | "houses" | "trivia" | "missions" | "roles" | "settings";
 
 function AdminPage() {
   const nav = useNavigate();
+  const { access } = Route.useRouteContext();
+  const isSuperAdmin = !!access.roles?.includes("super_admin");
   const [tab, setTab] = useState<Tab>("overview");
   const fetchOverview = useServerFn(getAdminOverview);
   const { data, isLoading, error } = useQuery({
@@ -60,6 +63,7 @@ function AdminPage() {
       <nav className="mt-6 flex flex-wrap gap-2 border-b border-border">
         {([
           ["overview", "Resumen"],
+          ["audit", "Auditoría"],
           ["registration", "Registro"],
           ["houses", "Casas"],
           ["trivia", "Trivia"],
@@ -79,6 +83,7 @@ function AdminPage() {
 
       <div className="mt-6">
         {tab === "overview" && <OverviewTab data={data} />}
+        {tab === "audit" && <AdminAuditLab isSuperAdmin={isSuperAdmin} />}
         {tab === "registration" && <RegistrationAdmin />}
         {tab === "houses" && <HousesTab data={data} />}
         {tab === "trivia" && <TriviaTab />}
