@@ -1,3 +1,10 @@
+# Auditoría visual y laboratorio seguro
+- [ ] Añadir modo borrador exclusivo de desarrollo en /registro para abrir un Dashboard simulado sin escribir datos.
+- [ ] Añadir generador administrativo de casos de prueba con AI Gateway y validación estricta de la respuesta.
+- [ ] Añadir laboratorio Super Admin de cuentas ficticias simuladas, validación de permisos en servidor e historial local.
+- [ ] Verificar autorización, ausencia de escrituras en producción y recorridos principales.
+- [ ] Crear cuentas reales aisladas — bloqueado: requiere un backend de pruebas separado; no se usará Auth de producción.
+
 # Fase 1 — Onboarding y registro
 - [x] Añadir estructura compatible de Houses, grupos e identidad estable sin modificar pantallas.
 - [x] Reforzar privacidad de afiliaciones y bloqueo de marcadores en la base de datos.
