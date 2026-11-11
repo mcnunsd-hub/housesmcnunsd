@@ -38,6 +38,8 @@
 
 /* ============= NEUTRAL (pre-sort) ============= */
 :root {
+  --qr-paper: #ffffff;
+  --qr-ink: #000000;
   --radius: 0.5rem;
   --background: oklch(0.16 0.005 270);
   --foreground: oklch(0.96 0.005 270);
