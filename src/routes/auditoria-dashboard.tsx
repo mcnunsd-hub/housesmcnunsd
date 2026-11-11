@@ -2,6 +2,7 @@ import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { ArrowLeft, ClipboardCheck, QrCode, Sparkles, Trophy, FlaskConical } from "lucide-react";
 import { pageMeta } from "@/lib/page-meta";
 import { Button } from "@/components/ui/button";
+import { DemoQrLab } from "@/components/demo-qr-lab";
 
 export const Route = createFileRoute("/auditoria-dashboard")({
   beforeLoad: () => { if (!import.meta.env.DEV) throw notFound(); },
@@ -43,6 +44,7 @@ function AuditDashboardPage() {
         <Button type="button" variant="outline" size="sm" disabled>Simulado</Button>
       </div>)}
     </section>
+    <DemoQrLab />
     <Link to="/registro" className="mt-8 inline-flex items-center gap-2 text-xs uppercase tracking-[0.2em] text-muted-foreground hover:text-foreground"><ArrowLeft className="size-4" />Volver al registro</Link>
   </main>;
 }
