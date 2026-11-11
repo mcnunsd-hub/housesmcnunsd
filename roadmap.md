@@ -1,4 +1,5 @@
 # Auditoría visual y laboratorio seguro
+- [x] Generar y comprobar tres QR ficticios en la vista local, sin escrituras ni asistencia oficial; decodificación, duplicados, entradas inválidas y reinicio probados.
 - [ ] Añadir modo borrador exclusivo de desarrollo en /registro para abrir un Dashboard simulado sin escribir datos.
 - [ ] Añadir generador administrativo de casos de prueba con AI Gateway y validación estricta de la respuesta.
 - [ ] Añadir laboratorio Super Admin de cuentas ficticias simuladas, validación de permisos en servidor e historial local.
