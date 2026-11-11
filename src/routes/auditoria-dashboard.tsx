@@ -1,8 +1,8 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { ArrowLeft, ClipboardCheck, QrCode, Sparkles, Trophy, FlaskConical } from "lucide-react";
+import { ArrowLeft, ClipboardCheck, Sparkles, Trophy, FlaskConical } from "lucide-react";
 import { pageMeta } from "@/lib/page-meta";
 import { Button } from "@/components/ui/button";
-import { DemoQrLab } from "@/components/demo-qr-lab";
+import { DemoRetosLab } from "@/components/demo-retos-lab";
 
 export const Route = createFileRoute("/auditoria-dashboard")({
   beforeLoad: () => { if (!import.meta.env.DEV) throw notFound(); },

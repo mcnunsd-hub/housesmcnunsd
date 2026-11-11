@@ -6,4 +6,4 @@
 - Parse CSV/XLSX in the browser after file selection; import explicit catalog fields only and reject formulas, missing required values and duplicates before submission.
 - Preserve legacy onboarding fields; expose stable IDs, approval status and House FK as generated read-only projections to avoid divergent identities or assignments.
 - Keep the leaderboard feed aggregated by House/day without participant identity; enforce score locking in RPCs and restrictive RLS, not just presentation.
-- Keep demo QR payloads non-URL and confined to the development audit view with in-memory validation; they must never invoke official Check-in or persist attendance.
+- Keep the local Retos walkthrough confined to the development audit view and in-memory state; sample content is non-official, never invokes real mission, evidence or points APIs, and validation uses a distinct fictional identity.
