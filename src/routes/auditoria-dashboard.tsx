@@ -1,5 +1,5 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { ArrowLeft, ClipboardCheck, Sparkles, Trophy, FlaskConical } from "lucide-react";
+import { ArrowLeft, ClipboardCheck, Sparkles, Trophy, FlaskConical, QrCode } from "lucide-react";
 import { pageMeta } from "@/lib/page-meta";
 import { Button } from "@/components/ui/button";
 import { DemoRetosLab } from "@/components/demo-retos-lab";

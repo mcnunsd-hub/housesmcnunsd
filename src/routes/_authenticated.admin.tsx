@@ -8,7 +8,7 @@ import {
   getAdminOverview, setAppSetting,
   upsertMission, deleteMission, listAllMissions,
   upsertTriviaQuestion, deleteTriviaQuestion, listAllTrivia,
-  assignRoleByEmail, revokeRole,
+  assignRoleByEmail, revokeRole, deleteParticipant,
 } from "@/lib/admin.functions";
 import { HOUSES, type HouseId } from "@/lib/houses";
 import { HouseCrest } from "@/components/house-crest";
@@ -18,14 +18,14 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { RegistrationAdmin } from "@/components/admin-registration";
-import { AdminAuditLab } from "@/components/admin-audit-lab";
+import { SolicitudesTab } from "@/components/admin-solicitudes";
 
 export const Route = createFileRoute("/_authenticated/admin")({
   head: () => pageMeta("Panel de Administración — MCNUN Houses", "Administración autorizada de MCNUN Houses."),
   component: AdminPage,
 });
 
-type Tab = "overview" | "audit" | "registration" | "houses" | "trivia" | "missions" | "roles" | "settings";
+type Tab = "overview" | "solicitudes" | "registration" | "houses" | "trivia" | "missions" | "roles" | "settings";
 
 function AdminPage() {
   const nav = useNavigate();
@@ -63,7 +63,7 @@ function AdminPage() {
       <nav className="mt-6 flex flex-wrap gap-2 border-b border-border">
         {([
           ["overview", "Resumen"],
-          ["audit", "Auditoría"],
+          ...(isSuperAdmin ? ([["solicitudes", "Solicitudes"]] as const) : []),
           ["registration", "Registro"],
           ["houses", "Casas"],
           ["trivia", "Trivia"],
@@ -83,7 +83,7 @@ function AdminPage() {
 
       <div className="mt-6">
         {tab === "overview" && <OverviewTab data={data} />}
-        {tab === "audit" && <AdminAuditLab isSuperAdmin={isSuperAdmin} />}
+        {tab === "solicitudes" && isSuperAdmin && <SolicitudesTab />}
         {tab === "registration" && <RegistrationAdmin />}
         {tab === "houses" && <HousesTab data={data} />}
         {tab === "trivia" && <TriviaTab />}
@@ -137,6 +137,22 @@ function Stat({ label, value }: { label: string; value: number }) {
 // ---------- Houses ----------
 function HousesTab({ data }: { data: any }) {
   const houses: HouseId[] = ["atlas", "aurora", "summit", "eclipse"];
+  const qc = useQueryClient();
+  const deleteFn = useServerFn(deleteParticipant);
+
+  const remove = useMutation({
+    mutationFn: (userId: string) => deleteFn({ data: { userId } }),
+    onSuccess: (result: any) => {
+      qc.invalidateQueries({ queryKey: ["admin-overview"] });
+      if (result?.warnings?.length || result?.complete === false) {
+        toast.warning(result?.message ?? "Participante eliminado parcialmente. Revise la consola.");
+      } else {
+        toast.success("Participante eliminado");
+      }
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
   return (
     <div className="space-y-6">
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
@@ -167,7 +183,7 @@ function HousesTab({ data }: { data: any }) {
         <div className="max-h-[60vh] overflow-auto">
           <table className="w-full text-xs">
             <thead className="text-left text-[10px] uppercase tracking-[0.2em] text-muted-foreground bg-muted/30">
-              <tr><th className="p-2">Nombre</th><th className="p-2">Casa</th><th className="p-2">Nivel</th><th className="p-2">Comité</th><th className="p-2">País</th></tr>
+              <tr><th className="p-2">Nombre</th><th className="p-2">Casa</th><th className="p-2">Nivel</th><th className="p-2">Comité</th><th className="p-2">País</th><th className="p-2 text-right">Acciones</th></tr>
             </thead>
             <tbody>
               {data.profiles.map((p: any) => (
@@ -177,6 +193,20 @@ function HousesTab({ data }: { data: any }) {
                   <td className="p-2">{p.seniority_tier === "advanced" ? "Avanzado" : "Novato"}</td>
                   <td className="p-2 text-muted-foreground">{p.committee ?? "—"}</td>
                   <td className="p-2 text-muted-foreground">{p.country ?? "—"}</td>
+                  <td className="p-2 text-right">
+                    <Button
+                      size="sm"
+                      variant="destructive"
+                      disabled={remove.isPending}
+                      onClick={() => {
+                        if (confirm(`¿Eliminar a ${p.full_name ?? "este participante"}? Esta acción no se puede deshacer.`)) {
+                          remove.mutate(p.id);
+                        }
+                      }}
+                    >
+                      Eliminar
+                    </Button>
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -415,7 +445,7 @@ function RolesTab({ data }: { data: any }) {
           </select>
           <Button onClick={() => assign.mutate()} disabled={!email || assign.isPending}>Asignar</Button>
         </div>
-        <p className="text-[10px] text-muted-foreground">El usuario debe haberse registrado antes. Solo un Super Admin puede otorgar Admin o Super Admin. Cada cambio queda en el registro de auditoría.</p>
+        <p className="text-[10px] text-muted-foreground">El usuario debe haberse registrado antes. Solo un Super Admin puede otorgar Admin o Super Admin.</p>
       </div>
 
       <div className="rounded border border-border bg-card/40 overflow-hidden">

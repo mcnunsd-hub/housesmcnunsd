@@ -239,6 +239,51 @@ export const assignRoleByEmail = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
+// ---------- Participants ----------
+export const deleteParticipant = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) => z.object({ userId: z.string().uuid() }).parse(input))
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    await assertAdmin(supabase, userId);
+    if (data.userId === userId) throw new Error("No puedes eliminar tu propia cuenta.");
+
+    const uid = data.userId;
+
+    // Ruta completa: función SECURITY DEFINER incluida en README.md.
+    const { error: rpcError } = await (supabase as any).rpc("admin_delete_participant", { _user_id: uid });
+    if (!rpcError) return { ok: true, complete: true, warnings: [] as string[] };
+    const rpcMissing = rpcError.code === "PGRST202" || /not find|does not exist/i.test(rpcError.message);
+
+    // Respaldo sin función: elimina lo que las políticas actuales permiten.
+    // El perfil es lo que muestra la tabla de Casas, así que se elimina primero.
+    const warnings: string[] = [];
+    const steps: { table: string; column: string }[] = [
+      { table: "profiles", column: "id" },
+      { table: "user_roles", column: "user_id" },
+      { table: "house_assignments", column: "user_id" },
+      { table: "score_events", column: "user_id" },
+      { table: "mission_submissions", column: "user_id" },
+      { table: "checkin_events", column: "user_id" },
+      { table: "participants", column: "user_id" },
+    ];
+    for (const step of steps) {
+      const { error } = await supabase.from(step.table as any).delete().eq(step.column as any, uid);
+      if (!error) continue;
+      if (step.table === "profiles") throw new Error(`No se pudo eliminar el perfil: ${error.message}`);
+      warnings.push(step.table);
+    }
+
+    return {
+      ok: true,
+      complete: false,
+      warnings,
+      message: rpcMissing
+        ? "Perfil y accesos eliminados. Aplique la función admin_delete_participant del README para borrar también la ficha del participante."
+        : rpcError.message,
+    };
+  });
+
 export const revokeRole = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input) => z.object({ id: z.string().uuid() }).parse(input))

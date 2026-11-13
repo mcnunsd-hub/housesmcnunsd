@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { lovable } from "@/integrations/lovable";
+import { signInWithGoogle } from "@/lib/google-auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -40,9 +40,7 @@ function SignupPage() {
 
   async function google() {
     try {
-      const r = await lovable.auth.signInWithOAuth("google", { redirect_uri: `${window.location.origin}/auth/callback` });
-      if (r.error) { toast.error("No fue posible iniciar sesión con Google."); return; }
-      if (!r.redirected) await nav({ to: "/portal", replace: true });
+      await signInWithGoogle();
     } catch { toast.error("No fue posible iniciar sesión con Google."); }
   }
 

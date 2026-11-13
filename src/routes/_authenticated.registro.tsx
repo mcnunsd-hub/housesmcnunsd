@@ -1,9 +1,11 @@
 import { createFileRoute, useNavigate, useRouter } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import { z } from "zod";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { requestRegistrationReview } from "@/lib/registration.functions";
 import { AccessSignOut } from "@/components/access-signout";
 import { pageMeta } from "@/lib/page-meta";
 import { Button } from "@/components/ui/button";
@@ -35,6 +37,7 @@ function RegistroPage() {
   const nav = useNavigate();
   const router = useRouter();
   const qc = useQueryClient();
+  const requestReview = useServerFn(requestRegistrationReview);
 
   const [type, setType] = useState<PType | null>(null);
   const [fullName, setFullName] = useState("");
@@ -86,6 +89,8 @@ function RegistroPage() {
       _roster_id: rosterId || null, _code: code.trim() || null,
     });
     if (error) throw error;
+    // Toda ficha queda en revisión hasta que un Super Admin la apruebe.
+    await requestReview().catch(() => null);
     await qc.invalidateQueries();
     await router.invalidate();
     await nav({ to: "/portal", replace: true });
@@ -98,7 +103,7 @@ function RegistroPage() {
     <div className="mx-auto max-w-md px-6 py-10">
       <p className="text-[10px] uppercase tracking-[0.35em] text-muted-foreground">MCNUN 2026 · Registro</p>
       <h1 className="mt-2 text-2xl font-semibold tracking-tight">¿Cómo participas?</h1>
-      <p className="mt-2 text-sm text-muted-foreground">Registro incompleto. Complete su ficha para continuar.</p>
+      <p className="mt-2 text-sm text-muted-foreground">Registro incompleto. Complete su ficha; el Secretariado revisará su solicitud antes de habilitar el acceso.</p>
       <div className="mt-6 grid gap-2">
         {TYPES.map((t) => (
           <Button key={t.id} type="button" variant="outline" onClick={() => setType(t.id)}
@@ -156,7 +161,7 @@ function RegistroPage() {
           )}
 
           <Button type="submit" disabled={busy} className="w-full text-xs uppercase tracking-[0.2em]">
-            {draftMode && import.meta.env.DEV ? "Completar registro en modo borrador" : busy ? "Enviando…" : type === "delegado" ? "Continuar a la Ceremonia" : "Completar registro"}
+            {draftMode && import.meta.env.DEV ? "Completar registro en modo borrador" : busy ? "Enviando…" : "Enviar solicitud"}
           </Button>
         </form>
       )}

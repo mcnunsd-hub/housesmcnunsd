@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { lovable } from "@/integrations/lovable";
+import { signInWithGoogle } from "@/lib/google-auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -36,12 +36,7 @@ function LoginPage() {
 
   async function google() {
     try {
-      const r = await lovable.auth.signInWithOAuth("google", { redirect_uri: `${window.location.origin}/auth/callback` });
-      if ("error" in r && r.error) {
-        toast.error(String((r.error as Error).message ?? r.error));
-        return;
-      }
-      if (!r.redirected) await nav({ to: "/portal", replace: true });
+      await signInWithGoogle();
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Error al iniciar con Google");
     }
